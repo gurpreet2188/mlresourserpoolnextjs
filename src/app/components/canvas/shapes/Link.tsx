@@ -35,6 +35,8 @@ function Link ({ id, nodeState, anchorID, setDeleteLink }: LinkPorps) {
     console.log('click')
   }
 
+
+  
   useEffect(() => {
     setDeleteLink(
       selected
