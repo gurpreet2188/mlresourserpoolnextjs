@@ -50,16 +50,6 @@ export interface AnchorBaseConfig {
 
 }
 
-interface MyInterface {
-    prop1: string;
-    prop2: number;
-}
-
-interface ExtendedInterface extends MyInterface {
-    [key: string]: any;
-}
-
-
 
 
 export interface AnchorConfig extends AnchorBaseConfig {
@@ -88,7 +78,9 @@ export interface Link {
 
 export interface NodesConfigObjectChild {
     'name': string,
+    'type': string,
     'active': boolean,
+    'connected':boolean,
     'icon': string,
     'anchors': Array<string>,
     'anchorPoint': boolean,
@@ -116,7 +108,7 @@ export interface NodeStyles {
 }
 
 export interface NodeConfig {
-    [key: string]: NodesConfigObject,
+    [key: string]: NodesConfigObjectChild,
 }
 
 
@@ -158,6 +150,8 @@ export interface WorkspaceContextTypes {
     nodeState: NodeState,
     nodeDispatch: React.Dispatch<NodeStateAction>,
     setDeleteLink: React.Dispatch<{nodeID:string, anchorID:string}>
+    workspaceArea: {hit:boolean, x:number,y:number}
+    setWorkspaceArea: React.Dispatch<{hit:boolean, x:number,y:number}>
 }
 
 
@@ -172,13 +166,14 @@ export interface NodeStateProps {
 }
 
 export interface AnchorPorps extends NodeProps, NodeStateProps {
-    anchorID: string
+    anchorID: string,
+    nodeDragging:boolean
 }
 
 export interface LinkPorps extends NodeProps {
     nodeState: NodeState,
     anchorID: string,
-    setDeleteLink: React.Dispatch<{nodeID:string, anchorID:string}
+    setDeleteLink: React.Dispatch<{nodeID:string, anchorID:string}>,
 }
 
 export interface NodeStateReducer {

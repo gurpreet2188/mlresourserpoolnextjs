@@ -5,7 +5,7 @@ import { Circle } from 'react-konva'
 
 
 
-function Anchor ({ id, anchorID, nodeState, nodeDispatch }: AnchorPorps) {
+function Anchor ({ id, anchorID, nodeState, nodeDispatch, nodeDragging }: AnchorPorps) {
   const [proximityAnchorPoint, setProximityAnchorPoint] = useState("csv")
 
 
@@ -41,7 +41,7 @@ function Anchor ({ id, anchorID, nodeState, nodeDispatch }: AnchorPorps) {
     })
   }
 
-  const dragEndHandle = (e: KonvaEventObject<DragEvent>) => {
+  const dragEndHandle = () => {
 
     if (nodeState[id][anchorID].anchorProximity && proximityAnchorPoint) {
       nodeDispatch({
@@ -65,6 +65,7 @@ function Anchor ({ id, anchorID, nodeState, nodeDispatch }: AnchorPorps) {
           y: nodeState[proximityAnchorPoint]['anchorPointProperties'].y
         }
       })
+      nodeDispatch({ type: 'updateNode', nodeID: id, value: {connected: true} })
       //   setProximityAnchorPoint(undefined)
     } else {
       nodeDispatch({
@@ -103,6 +104,7 @@ function Anchor ({ id, anchorID, nodeState, nodeDispatch }: AnchorPorps) {
   return (
     <Circle
       id={'anchorPoint_' + id}
+      visible={!nodeDragging || nodeState[id][anchorID].anchorConnected && false}
       draggable
       onDragMove={dragHandle}
       onDragEnd={dragEndHandle}

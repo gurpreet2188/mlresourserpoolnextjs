@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  createContext,
-  useReducer,
-  Reducer
-} from 'react'
+import React, { useState, useEffect, createContext, useReducer } from 'react'
 import { Layer, Stage } from 'react-konva'
 // import Node from './shapes/Node'
 import { nodeConfig, nodeStyles } from '@/app/nodes/config'
@@ -15,9 +9,8 @@ import {
 } from '@/app/interface/types'
 import Sidebar from './Sidebar'
 import MainArea from './WorkspaceArea/MainArea'
-import { KonvaEventObject } from 'konva/lib/Node'
 
-const commonNodes = nodeConfig.commonNodes
+
 const initialCommonNodeState: NodeState = {
   dummy: {
     active: false,
@@ -38,11 +31,12 @@ const initialCommonNodeState: NodeState = {
   }
 }
 
-// const getInitialCommonNodeState:NodeState = Object.keys(commonNodes).map(v => ({...getInitialCommonNodeState}))
 export const WorkSpaceContext = createContext<WorkspaceContextTypes>({
   nodeState: initialCommonNodeState,
   nodeDispatch: () => {},
-  setDeleteLink: ()=>{}
+  setDeleteLink: () => {},
+  workspaceArea:{hit:false, x:0,y:0},
+  setWorkspaceArea: ()=>{}
 })
 function Workspace () {
   const [workspace, setWorkspace] = useState({
@@ -51,14 +45,9 @@ function Workspace () {
   })
 
   const [nodes, setNodes] = useState<NodeState>(initialCommonNodeState)
-  const [nodeClone, setNodeClone] = useState({ dummy: { copies: 0 } })
   const [nodeState, nodeDispatch] = useReducer(reducer, nodes)
-  const [nodesLenght, setNodesLenght] = useState<number>(
-    Object.keys(nodes).length
-  )
-
-
-  const [deleteLink, setDeleteLink] = useState({nodeID:"", anchorID:""})
+  const [workspaceArea, setWorkspaceArea] = useState({hit:false, x:0,y:0})
+  const [deleteLink, setDeleteLink] = useState({ nodeID: '', anchorID: '' })
   useEffect(() => {
     if (window) {
       setWorkspace({
@@ -79,18 +68,18 @@ function Workspace () {
 
   useEffect(() => {
     setNodes({})
-    for (const key of Object.keys(commonNodes)) {
+    for (const key of Object.keys(nodeConfig)) {
       setNodes(p => ({
         ...p,
         [key]: {
-          ...commonNodes[key],
+          ...nodeConfig[key],
           ...Object.fromEntries(
-            commonNodes[key].anchors.map(v => [
+            nodeConfig[key].anchors.map(v => [
               v,
               {
                 ...nodeStyles.anchor,
-                x: commonNodes[key].x + nodeStyles.anchor.x,
-                y: commonNodes[key].y + nodeStyles.anchor.y
+                x: nodeConfig[key].x + nodeStyles.anchor.x,
+                y: nodeConfig[key].y + nodeStyles.anchor.y
               }
             ])
           ),
@@ -111,7 +100,6 @@ function Workspace () {
           }
         }
       }))
-      setNodesLenght(Object.keys(nodes).length + 1)
     }
   }, [])
 
@@ -146,7 +134,7 @@ function Workspace () {
           [action.nodeID]: {
             ...state[action.nodeID],
             anchorBaseProperties: {
-              ...state[action.nodeID].anchorBasePropertie,
+              ...state[action.nodeID].anchorBaseProperties,
               ...action.value
             }
           }
@@ -182,29 +170,31 @@ function Workspace () {
   }
 
   useEffect(() => {
-    if (Object.keys(nodes).length === Object.keys(commonNodes).length) {
+    if (Object.keys(nodes).length === Object.keys(nodeConfig).length) {
       nodeDispatch({ type: 'setNodes', nodes: nodes })
     }
   }, [nodes])
 
   const verifyNodes = () => {
-    return Object.keys(nodeState).length === Object.keys(commonNodes).length
+    return Object.keys(nodeState).length === Object.keys(nodeConfig).length
   }
 
-  const deleteLinkHandle = (e:React.KeyboardEvent<HTMLDivElement>) => {
+  const deleteLinkHandle = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Delete') {
-      nodeDispatch({
-        type: 'updateAnchor',
-        nodeID: deleteLink.nodeID,
-        anchorID: deleteLink.anchorID,
-        value: { anchorConnected: false }
-      })
+      if (deleteLink.anchorID !== '' && deleteLink.nodeID !== '') {
+        nodeDispatch({
+          type: 'updateAnchor',
+          nodeID: deleteLink.nodeID,
+          anchorID: deleteLink.anchorID,
+          value: { anchorConnected: false }
+        })
+      }
       console.log('delete')
-      setDeleteLink({nodeID:"", anchorID:""})
+      setDeleteLink({ nodeID: '', anchorID: '' })
     }
   }
 
-  // console.log(deleteLink)
+  // console.log(workspaceArea)
   return (
     <div onKeyDown={deleteLinkHandle} tabIndex={0}>
       <Stage width={workspace.width} height={workspace.height}>
@@ -215,17 +205,13 @@ function Workspace () {
                 value={{
                   nodeState,
                   nodeDispatch,
-                  setDeleteLink
+                  setDeleteLink,
+                  workspaceArea,
+                  setWorkspaceArea
                 }}
               >
-                <Sidebar
-                  width={workspace.width}
-                  height={workspace.height}
-                />
-                <MainArea width={workspace.width} height={workspace.height} />
-                {/* {Object.keys(commonNodes).map(v => (
-                  <Node key={v} id={v} />
-                ))} */}
+                <Sidebar width={workspace.width} height={workspace.height} />
+                {workspaceArea.hit ? <MainArea width={workspace.width} height={workspace.height} /> : <></>}
               </WorkSpaceContext.Provider>
             </>
           ) : null}

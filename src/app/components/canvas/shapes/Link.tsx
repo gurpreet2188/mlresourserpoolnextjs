@@ -1,13 +1,33 @@
 import { LinkPorps } from '@/app/interface/types'
 import { KonvaEventObject } from 'konva/lib/Node'
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useRef, useState } from 'react'
 import { Line } from 'react-konva'
 
 function Link ({ id, nodeState, anchorID, setDeleteLink }: LinkPorps) {
   const [points, setPoints] = useState<Array<number>>()
   const [selected, setSelected] = useState(false)
-
+  // const lineWorker = new Worker(new URL('./lineWorker.ts', import.meta.url))
+ 
+  
+  // useEffect(()=>{
+    
+    
+  //   return ()=> {
+  //     lineWorker.terminate()
+  //   }
+  // },[])
+  
   useEffect(() => {
+    // const updatedPoints = {
+    //   x1: nodeState[id].anchorBaseProperties.x, y1: nodeState[id].anchorBaseProperties.y,
+    //   x2: nodeState[id][anchorID].x, y2: nodeState[id][anchorID].y
+    // }
+    // lineWorker.postMessage({updatedPoints})
+    // lineWorker.addEventListener('message', (e)=>{
+    //   const {calcPoints} = e.data
+    //   setPoints(calcPoints)
+    //   console.log(calcPoints)
+    // })
     setPoints([
       0,
       0,
@@ -22,6 +42,10 @@ function Link ({ id, nodeState, anchorID, setDeleteLink }: LinkPorps) {
       nodeState[id][anchorID].x - nodeState[id].anchorBaseProperties.x,
       nodeState[id][anchorID].y - nodeState[id].anchorBaseProperties.y
     ])
+
+    // return ()=> {
+    //   lineWorker.terminate()
+    // }
   }, [
     nodeState[id][anchorID].y,
     nodeState[id][anchorID].x,
@@ -31,19 +55,23 @@ function Link ({ id, nodeState, anchorID, setDeleteLink }: LinkPorps) {
 
   const clickHandle = (e: KonvaEventObject<MouseEvent>) => {
     setSelected(!selected)
-
-    console.log('click')
+    setDeleteLink({ nodeID: id, anchorID: anchorID })
+    // console.log('click')
   }
 
-
-  
   useEffect(() => {
-    setDeleteLink(
-      selected
-        ? { nodeID: id, anchorID: anchorID }
-        : { nodeID: '', anchorID: '' }
-    )
+    if (selected) {
+      setDeleteLink({ nodeID: id, anchorID: anchorID })
+    } else {
+      setDeleteLink({ nodeID: "", anchorID: "" })
+    }
   }, [selected])
+
+  useEffect(()=>{
+    if(!nodeState[id][anchorID].anchorConnected) {
+      setSelected(false)
+    }
+  },[nodeState[id][anchorID].anchorConnected])
 
   return (
     <Line
@@ -57,10 +85,35 @@ function Link ({ id, nodeState, anchorID, setDeleteLink }: LinkPorps) {
       x={nodeState[id].anchorBaseProperties.x}
       y={nodeState[id].anchorBaseProperties.y}
       points={points}
-      stroke={'#ffffff'}
-      strokeWidth={4}
+      stroke={selected ? "#a0a0a0" : "#ffffff"}
+      strokeWidth={selected ? 6 : 4}
     />
   )
 }
 
-export default Link
+export default memo(Link)
+
+
+
+// function lineWorker () {
+//  self.addEventListener('message', (e)=> {
+//   const {x1,y1,x2,y2} = e.data
+//   const calcPoints = [
+//     0,
+//     0,
+//     Math.abs(
+//       x1 - x2
+//     ) / 2,
+//     0,
+//     Math.abs(
+//       x1 - x2
+//     ) / 2,
+//     y2 - y1,
+//     x2 - x1,
+//     y2 - y1
+//   ]
+//   self.postMessage(calcPoints)
+//  })
+
+
+// }
