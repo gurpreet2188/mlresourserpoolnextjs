@@ -25,10 +25,7 @@ function NodeStatic ({ id }: NodeProps) {
           styles={nodeState[id].nodeRectProperties}
         />
 
-        <ImageIcon
-          iconName={nodeState[id].icon}
-          active={nodeState[id].active}
-        />
+        <ImageIcon id={id} iconName={nodeState[id].icon} active={false} />
         <Text
           text={nodeState[id].name}
           y={nodeState[id].nodeRectProperties.height + 10}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, createContext, useReducer } from 'react'
+// import {block} from 'million/react'
 import { Layer, Stage } from 'react-konva'
 // import Node from './shapes/Node'
 import { nodeConfig, nodeStyles } from '@/app/nodes/config'
@@ -164,6 +165,18 @@ function Workspace () {
           }
         }
 
+        case 'updateNodeRectProperties':
+        return {
+          ...state,
+          [action.nodeID]: {
+            ...state[action.nodeID],
+            nodeRectProperties: {
+              ...state[action.nodeID].nodeRectProperties,
+              ...action.value
+            }
+          }
+        }
+
       default:
         return state
     }
@@ -196,7 +209,7 @@ function Workspace () {
 
   // console.log(workspaceArea)
   return (
-    <div onKeyDown={deleteLinkHandle} tabIndex={0}>
+    <div onKeyDown={deleteLinkHandle} tabIndex={0} className='absolute'>
       <Stage width={workspace.width} height={workspace.height}>
         <Layer>
           {verifyNodes() ? (

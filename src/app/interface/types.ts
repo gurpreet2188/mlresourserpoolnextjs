@@ -1,3 +1,5 @@
+import { ReactNode } from "react"
+
 export interface WidgetProps {
     name: string,
     id: string,
@@ -137,6 +139,7 @@ export type NodeStateAction = { type: 'getNodes'; nodes: NodeState }
     | { type: 'updateAnchorBase'; nodeID: string, value: object }
     | { type: 'updateAnchorPoint'; nodeID: string, value: object }
     | { type: 'updateLinkProperties'; nodeID: string, value: object }
+    | { type: 'updateNodeRectProperties'; nodeID: string, value: object }
 
 
 // export interface NodeStateAction extends WorkspaceContextActoin {
@@ -179,3 +182,57 @@ export interface LinkPorps extends NodeProps {
 export interface NodeStateReducer {
 
 }
+
+export interface ColumnsType {
+    [key:string]: boolean
+}
+
+export interface NodeSettingsState {
+    csv: {
+      settingsActive: boolean;
+    };
+    columnFilter: {
+      settingsActive: boolean,
+      columns: ColumnsType
+    };
+    rowFilter: {
+      settingsActive: boolean;
+    };
+    tableView: {
+      settingsActive: boolean;
+    };
+    knn: {
+      settingsActive: boolean;
+    };
+    linearRegression: {
+      settingsActive: boolean;
+    };
+    decisionTree: {
+      settingsActive: boolean;
+    };
+    randomForest: {
+      settingsActive: boolean;
+    };
+  }
+
+export type NodeSettingsAction =
+| { type: 'csv'; value: boolean }
+| { type: 'columnFilter'; value: boolean }
+| { type: 'rowFilter'; value: boolean }
+| { type: 'tableView'; value: boolean }
+| { type: 'knn'; value: boolean }
+| { type: 'linearRegression'; value: boolean }
+| { type: 'decisionTree'; value: boolean }
+| { type: 'randomForest'; value: boolean }
+
+export interface NodeSettingContext {
+    nodeSettingsState: NodeSettingsState,
+    nodeSettingsDispatch: React.Dispatch<NodeSettingsAction>
+}
+
+export interface NodeSettingProps {
+    id?: string,
+    title?: string
+    children?: ReactNode
+}
+  

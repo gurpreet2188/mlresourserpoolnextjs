@@ -1,6 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { Rect } from 'react-konva'
 import Konva from 'konva';
+import { WorkspaceContextTypes } from '@/app/interface/types';
+import { WorkSpaceContext } from '../Workspace';
 
 type SidebarPorps = {
   width: number
@@ -8,6 +10,7 @@ type SidebarPorps = {
 }
 
 function MainArea ({ width, height }: SidebarPorps) {
+  const { workspaceArea, setWorkspaceArea, nodeState, nodeDispatch } = useContext< WorkspaceContextTypes>(WorkSpaceContext)
   const rectRef = useRef(null);
   useEffect(() => {
     const rectNode = rectRef.current;
@@ -42,11 +45,11 @@ function MainArea ({ width, height }: SidebarPorps) {
   return (
     <Rect
     ref={rectRef}
-      width={width - width * 0.18}
+      width={width - workspaceArea.x}
       height={height}
       fill='rgba(255, 255, 255, 0.1)'
       stroke='#ffffff'
-      x={width - width * 0.82}
+      x={workspaceArea.x}
     />
   )
 }

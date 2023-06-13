@@ -78,9 +78,13 @@ function Node ({ id }: NodeProps) {
   }
 
   useEffect(() => {
-      if(nodeState[id].connectedAnchorPoints.length === 0) {
-        nodeDispatch({ type: 'updateNode', nodeID: id, value: {connected: false} })
-      }
+    if (nodeState[id].connectedAnchorPoints.length === 0) {
+      nodeDispatch({
+        type: 'updateNode',
+        nodeID: id,
+        value: { connected: false }
+      })
+    }
   }, [nodeState[id].connectedAnchorPoints.length])
   return (
     <>
@@ -100,15 +104,21 @@ function Node ({ id }: NodeProps) {
           styles={nodeState[id].nodeRectProperties}
         />
 
-        {!nodeDraggin && <ImageIcon
-          iconName={nodeState[id].icon}
-          active={nodeState[id].active}
-        />}
+        {!nodeDraggin && (
+          <ImageIcon
+            id={id}
+            iconName={nodeState[id].icon}
+            active={nodeState[id].active}
+          />
+        )}
         {nodeState[id].anchorPoint && nodeState[id].active && (
           <AnchorPoint id={id} styles={nodeState[id].anchorPointProperties} />
         )}
-        
-        {nodeState[id].anchors.length > 0 && nodeState[id].active && nodeDraggin && nodeState[id].connectedAnchorPoints.length === 0?  (
+
+        {nodeState[id].anchors.length > 0 &&
+        nodeState[id].active &&
+        nodeDraggin &&
+        nodeState[id].connectedAnchorPoints.length === 0 ? (
           <AnchorBase id={id} styles={nodeState[id].anchorBaseProperties} />
         ) : (
           <></>
@@ -129,13 +139,13 @@ function Node ({ id }: NodeProps) {
               nodeState={nodeState}
               setDeleteLink={setDeleteLink}
             />
-              <Anchor
-                id={id}
-                anchorID={v}
-                nodeState={nodeState}
-                nodeDispatch={nodeDispatch}
-                nodeDragging={nodeDraggin}
-              />
+            <Anchor
+              id={id}
+              anchorID={v}
+              nodeState={nodeState}
+              nodeDispatch={nodeDispatch}
+              nodeDragging={nodeDraggin}
+            />
           </>
         ))}
     </>

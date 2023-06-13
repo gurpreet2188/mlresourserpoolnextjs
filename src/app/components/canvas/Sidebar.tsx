@@ -1,9 +1,12 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { Group, Line, Rect, Text } from 'react-konva'
+import { Group, Image, Line, Rect, Text } from 'react-konva'
 import Node from './shapes/Node'
 import NodeStatic from './shapes/NodeStatic'
 import { WorkSpaceContext } from './Workspace'
 import { WorkspaceContextTypes } from '@/app/interface/types'
+import { MdChevronRight, MdChevronLeft } from 'react-icons/md'
+import { svgIcon } from './shapes/Image'
+import { Image as KonvaImage } from 'react-konva'
 
 type SidebarPorps = {
   width: number
@@ -11,60 +14,84 @@ type SidebarPorps = {
 }
 
 function Sidebar ({ width, height }: SidebarPorps) {
-  const { workspaceArea, setWorkspaceArea, nodeState, nodeDispatch } = useContext< WorkspaceContextTypes>(WorkSpaceContext)
+  const [sideBar, setSidebar] = useState({ width: 300, height: height })
+  const [sideBarAccess, setSideBarAccess] = useState(false)
+  const { workspaceArea, setWorkspaceArea, nodeState, nodeDispatch } =
+    useContext<WorkspaceContextTypes>(WorkSpaceContext)
+
+  // useEffect(() => {
+  //   nodeDispatch({ type: 'updateNodeRectProperties', width: sideBar.width <=150 ? 40 , height: 60 })
+  // }, [sideBar.width])
+
   useEffect(() => {
-    const widthMax = width * (55 / (width - width * 0.82))
+    const tempSideBarWidth = width < 1000 ? 301 : 300
+
+    setSidebar({ width: tempSideBarWidth, height: height })
 
     Object.keys(nodeState).forEach((v, i) => {
-      const x = i % 2 === 0 ? widthMax / 1.78 : widthMax / 5
-      const y =
-        Math.floor(i / 2) * (height * (20 / (height - height * 0.8))) + (nodeState[v].type === 'common' ? 80 : 160)
-      if(!nodeState[v].active) {
+      const x = i % 2 === 0 ? tempSideBarWidth / 2 : tempSideBarWidth / 10
+      // const y =  i % 2 === 0 ? (nodeState[v].type === 'common' ? 100 : 350): (nodeState[v].type === 'common' ? 100 : 350)
+      // const y =
+      //   Math.floor(i / 2) * (height * (20 / (height - height * 0.8))) +
+      //   (nodeState[v].type === 'common' ? 80 : 160)
+      if (!nodeState[v].active) {
         nodeDispatch({
           type: 'updateNode',
           nodeID: v,
-          value: { x: x, y: y, staticX: x, staticY: y }
+          value: { x: x,  staticX: x, }
         })
       }
     })
-
-    setWorkspaceArea({hit:false, x: width - (width * 0.82), y: height})
+    setWorkspaceArea({ hit: false, x: tempSideBarWidth, y: height })
   }, [height, width])
+
+  useEffect(() => {
+    setSideBarAccess(sideBar.width < 300 ? true : false)
+  }, [sideBar.width])
 
   const category = (name: string, x: number, y: number) => (
     <>
-      <Group x={width - width * x} y={height - height * y}>
+      <Group x={sideBar.width / 20} y={y}>
         <Rect
-          fill='#1e1e1e'
+          fill='#333333'
           x={0}
           y={0}
-          width={width - width * 0.84}
-          height={height - height * 0.95}
+          width={sideBar.width - 70}
+          height={sideBar.width > 300 ? 40 : 50}
           cornerRadius={10}
         />
         <Text
           text={name}
           fill='#ffffff'
-          x={width - width * 0.989}
-          y={height - height * 0.982}
-          fontSize={height + width - (height + width) * 0.993}
+          align='center'
+          x={sideBar.width - sideBar.width * 0.96}
+          y={sideBar.width > 300 ? 14 : 18}
+          fontSize={sideBar.width > 300 ? 15 : 20}
         />
       </Group>
     </>
   )
-
+  // sideBar.width > 300 ? -(sideBar.width - 50) : 0
+  console.log(svgIcon(MdChevronLeft))
+  const sideBarAccessClickHandle = () => {
+    setSideBarAccess(!sideBarAccess)
+    console.log('click')
+  }
+  // visible={sideBar.width > 300}
   return (
-    <>
-      <Rect width={width - width * 0.82} height={height} fill='#131313' />
+    <Group
+      x={sideBar.width < 300 ? 0 : sideBar.width > 300 ? !sideBarAccess ? -(sideBar.width - 50) : 0: 0}
+    >
+      <Rect width={sideBar.width} height={sideBar.height} />
       <Line
         width={1}
         height={height}
         stroke='#FFCDB2'
         points={[0, 0, 0, height]}
-        x={width - width * 0.82}
+        x={sideBar.width}
         y={0}
       />
-      {category('Common Nodes', 0.99, 0.98)}
+      {category('Common Nodes', 0.99, 35)}
       {nodeState &&
         Object.keys(nodeState).map(v => (
           <>
@@ -76,7 +103,7 @@ function Sidebar ({ width, height }: SidebarPorps) {
             )}
           </>
         ))}
-      {category('Machine learning', 0.99, 0.68)}
+      {category('Machine learning', 0.99, sideBar.width > 300? 315 : 310)}
       {nodeState &&
         Object.keys(nodeState).map(v => (
           <>
@@ -88,7 +115,23 @@ function Sidebar ({ width, height }: SidebarPorps) {
             )}
           </>
         ))}
-    </>
+      {sideBar.width > 300 && (
+        <KonvaImage
+          onClick={sideBarAccessClickHandle}
+          onTouchStart={sideBarAccessClickHandle}
+          onTou
+          width={24}
+          height={24}
+          x={sideBar.width - 30}
+          y={10}
+          fill='#ffffff'
+          cornerRadius={50}
+          image={
+            sideBarAccess ? svgIcon(MdChevronLeft) : svgIcon(MdChevronRight)
+          }
+        />
+      )}
+    </Group>
   )
 }
 
