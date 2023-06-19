@@ -9,13 +9,14 @@ function MemUsage() {
     const fetchCPUUsage = async() =>{
       const res = await fetch('/api/ram-usage')
       const data = await res.json()
-      setMemusage(await data.siMemLoad.available / data.siMemLoad.total  * 100)
+      // console.log(data.siMemLoad.free / data.siMemLoad.total  * 100)
+      setMemusage(data.siMemLoad.free / data.siMemLoad.total  * 100)
       return 
     }
 
     const interval = setInterval(() => {
       fetchCPUUsage()
-    }, 5000);
+    }, 1000);
 
     return () => {
       clearInterval(interval);

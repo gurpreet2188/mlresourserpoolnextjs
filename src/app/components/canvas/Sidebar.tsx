@@ -72,10 +72,10 @@ function Sidebar ({ width, height }: SidebarPorps) {
     </>
   )
   // sideBar.width > 300 ? -(sideBar.width - 50) : 0
-  console.log(svgIcon(MdChevronLeft))
+  // console.log(svgIcon(MdChevronLeft))
   const sideBarAccessClickHandle = () => {
     setSideBarAccess(!sideBarAccess)
-    console.log('click')
+    // console.log('click')
   }
   // visible={sideBar.width > 300}
   return (

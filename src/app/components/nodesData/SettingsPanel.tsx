@@ -35,7 +35,7 @@ const SettingsPanel: React.FC<NodeSettingProps> = ({ id, title, children }) => {
   }, [])
 
   const closeButtonHandle = () =>{
-    nodeSettingsDispatch({type:id, value: false})
+    nodeSettingsDispatch({type:id, value: {settingsActive: false}})
   }
   return (
     <div

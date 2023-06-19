@@ -16,7 +16,8 @@ export const nodeStyles: NodeStyles = {
         connectedHeight: 15,
         anchorDragging: false,
         anchorConnected: false,
-        anchorProximity: false
+        anchorProximity: false,
+        connectedNode: ''
     },
     anchorBase: {
         get x() { return nodeStyles.nodeRect.width },
@@ -34,7 +35,8 @@ export const nodeStyles: NodeStyles = {
         height: 20,
         color: "#ffffff",
         connectedWidth: 15,
-        connectedHeight: 15
+        connectedHeight: 15,
+        connectedNode: ''
     },
     nodeRect: { width: 80, height: 60, cornerRadius: [10, 10, 10, 10] },
     link: {
@@ -63,7 +65,7 @@ export const nodeConfig: NodeConfig = {
         y: 100,
         staticX: 100,
         staticY: 100,
-        connectedAnchorPoints: [],
+       
         toolTip: ""
     },
     columnFilter: {
@@ -80,7 +82,7 @@ export const nodeConfig: NodeConfig = {
         y: 200,
         staticX: 100,
         staticY: 200,
-        connectedAnchorPoints: [],
+       
         toolTip: ""
     },
 
@@ -98,7 +100,7 @@ export const nodeConfig: NodeConfig = {
         y: 200,
         staticX: 100,
         staticY: 200,
-        connectedAnchorPoints: [],
+       
         toolTip: ""
     },
     tableView: {
@@ -115,7 +117,7 @@ export const nodeConfig: NodeConfig = {
         y: 100,
         staticX: 100,
         staticY: 100,
-        connectedAnchorPoints: [],
+       
         toolTip: ""
     },
 
@@ -129,13 +131,13 @@ export const nodeConfig: NodeConfig = {
         anchors: ['knn1', 'knn2'],
         icon: 'BiScatterChart',
         anchorPoint: true,
-        acceptedNodes: [],
+        acceptedNodes: ['scorer'],
         nodeColor: "#a2d2ff",
         x: 100,
         y: 380,
         staticX: 100,
         staticY: 380,
-        connectedAnchorPoints: [],
+       
         toolTip: ""
     },
     linearRegression: {
@@ -146,13 +148,13 @@ export const nodeConfig: NodeConfig = {
         anchors: ['linearRegression1', 'linearRegression2'],
         icon: 'MdAutoGraph',
         anchorPoint: true,
-        acceptedNodes: [],
+        acceptedNodes: ['scorer'],
         nodeColor: "#a2d2ff",
         x: 100,
         y: 380,
         staticX: 100,
         staticY: 380,
-        connectedAnchorPoints: [],
+       
         toolTip: ""
     },
     decisionTree: {
@@ -163,13 +165,13 @@ export const nodeConfig: NodeConfig = {
         anchors: ['decisionTree', 'decisionTree'],
         icon: 'GrTreeOption',
         anchorPoint: true,
-        acceptedNodes: [],
+        acceptedNodes: ['scorer'],
         nodeColor: "#a2d2ff",
         x: 100,
         y: 480,
         staticX: 100,
         staticY: 480,
-        connectedAnchorPoints: [],
+       
         toolTip: ""
     },
     randomForest: {
@@ -180,13 +182,30 @@ export const nodeConfig: NodeConfig = {
         anchors: ['randomForest1', 'randomForest2'],
         icon: 'MdOutlineForest',
         anchorPoint: true,
-        acceptedNodes: [],
+        acceptedNodes: ['scorer'],
         nodeColor: "#a2d2ff",
         x: 100,
         y: 480,
         staticX: 100,
         staticY: 480,
-        connectedAnchorPoints: [],
+       
+        toolTip: ""
+    },
+    scorer: {
+        name: 'Accuracy Score',
+        type: 'machineLearning',
+        active: false,
+        connected:false,
+        anchors: [],
+        icon: 'MdSportsScore',
+        anchorPoint: true,
+        acceptedNodes: [],
+        nodeColor: "#a2d2ff",
+        x: 100,
+        y: 580,
+        staticX: 100,
+        staticY: 580,
+
         toolTip: ""
     },
 

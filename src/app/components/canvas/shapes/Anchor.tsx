@@ -1,13 +1,14 @@
+import { NodesSettingsStatus } from '@/app/MLResourcePool'
 import { AnchorPorps } from '@/app/interface/types'
 import { KonvaEventObject } from 'konva/lib/Node'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Circle } from 'react-konva'
 
 
 
 function Anchor ({ id, anchorID, nodeState, nodeDispatch, nodeDragging }: AnchorPorps) {
   const [proximityAnchorPoint, setProximityAnchorPoint] = useState("csv")
-
+  const {nodeSettingsState, nodeSettingsDispatch} = useContext(NodesSettingsStatus)
 
   const calcProximity = (x: number, y: number) => {
     for (const ids of nodeState[id].acceptedNodes) {
@@ -44,16 +45,16 @@ function Anchor ({ id, anchorID, nodeState, nodeDispatch, nodeDragging }: Anchor
   const dragEndHandle = () => {
 
     if (nodeState[id][anchorID].anchorProximity && proximityAnchorPoint) {
-      nodeDispatch({
-        type: 'updateNode',
-        nodeID: id,
-        value: {
-          connectedAnchorPoints: [
-            ...nodeState[id].connectedAnchorPoints,
-            proximityAnchorPoint
-          ]
-        }
-      })
+      // nodeDispatch({
+      //   type: 'updateNode',
+      //   nodeID: id,
+      //   value: {
+      //     connectedAnchorPoints: [
+      //       ...nodeState[id].connectedAnchorPoints,
+      //       proximityAnchorPoint
+      //     ]
+      //   }
+      // })
       nodeDispatch({
         type: 'updateAnchor',
         nodeID: id,
@@ -62,10 +63,13 @@ function Anchor ({ id, anchorID, nodeState, nodeDispatch, nodeDragging }: Anchor
           anchorDragging: false,
           anchorConnected: true,
           x: nodeState[proximityAnchorPoint]['anchorPointProperties'].x,
-          y: nodeState[proximityAnchorPoint]['anchorPointProperties'].y
+          y: nodeState[proximityAnchorPoint]['anchorPointProperties'].y,
+          connectedNode: proximityAnchorPoint
         }
       })
+      nodeDispatch({type: 'updateAnchorPoint', nodeID: proximityAnchorPoint, value:{connectedNode: id}})
       nodeDispatch({ type: 'updateNode', nodeID: id, value: {connected: true} })
+      nodeSettingsDispatch({type:proximityAnchorPoint, value: {'connectedWith': id}})
       //   setProximityAnchorPoint(undefined)
     } else {
       nodeDispatch({
@@ -80,16 +84,15 @@ function Anchor ({ id, anchorID, nodeState, nodeDispatch, nodeDragging }: Anchor
 
   useEffect(() => {
     if (
-      nodeState[id][anchorID].anchorConnected &&
-      nodeState[id].connectedAnchorPoints.length > 0 && nodeState[proximityAnchorPoint]
+      nodeState[id][anchorID].anchorConnected && nodeState[nodeState[id][anchorID].connectedNode]
     ) {
         nodeDispatch({
             type: 'updateAnchor',
             nodeID: id,
             anchorID: anchorID,
             value: {
-              x: nodeState[proximityAnchorPoint]['anchorPointProperties'].x,
-              y: nodeState[proximityAnchorPoint]['anchorPointProperties'].y
+              x: nodeState[nodeState[id][anchorID].connectedNode]['anchorPointProperties'].x,
+              y: nodeState[nodeState[id][anchorID].connectedNode]['anchorPointProperties'].y
             }
           })
     } else {
@@ -100,7 +103,8 @@ function Anchor ({ id, anchorID, nodeState, nodeDispatch, nodeDragging }: Anchor
             value: { x: nodeState[id].x + 80, y: nodeState[id].y + 30 }
           })
     }
-  }, [nodeState[id][anchorID].anchorConnected, nodeState[proximityAnchorPoint].x,nodeState[proximityAnchorPoint].y, nodeState[id].x, nodeState[id].y])
+  }, [nodeState[id][anchorID].anchorConnected, nodeState[nodeState[id][anchorID].connectedNode]?.x,nodeState[nodeState[id][anchorID].connectedNode]?.y, nodeState[id]?.x, nodeState[id]?.y])
+  //[nodeState[id][anchorID].anchorConnected, nodeState[nodeState[id][anchorID].connectedNode].x,nodeState[nodeState[id][anchorID].connectedNode].y, nodeState[id].x, nodeState[id].y]
   return (
     <Circle
       id={'anchorPoint_' + id}

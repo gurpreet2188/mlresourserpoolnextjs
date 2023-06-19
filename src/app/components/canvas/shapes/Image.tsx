@@ -4,7 +4,7 @@ import { FaBeer } from 'react-icons/fa'
 import { GrDocumentCsv, GrColumns, GrTable, GrTreeOption } from 'react-icons/gr'
 import { LuRows, LuSettings2, LuHelpCircle } from 'react-icons/lu'
 import { BiScatterChart } from 'react-icons/bi'
-import { MdAutoGraph, MdOutlineForest } from 'react-icons/md'
+import { MdAutoGraph, MdOutlineForest, MdSportsScore } from 'react-icons/md'
 import { NodesSettingsStatus } from '@/app/MLResourcePool'
 import { NodeSettingContext } from '@/app/interface/types'
 import { useContext } from 'react'
@@ -31,7 +31,7 @@ function ImageIcon ({ id, iconName, active }: imageIconTypes) {
     const helpIcon = svgIcon(LuHelpCircle)
 
     const closeButtonHandle = () => {
-      nodeSettingsDispatch({ type: id, value: true })
+      nodeSettingsDispatch({ type: id, value: {settingsActive: true} })
     }
     return (
       <>
@@ -71,6 +71,8 @@ function ImageIcon ({ id, iconName, active }: imageIconTypes) {
       return setImage(MdOutlineForest)
     case 'GrTreeOption':
       return setImage(GrTreeOption)
+    case 'MdSportsScore':
+      return setImage(MdSportsScore)
     default:
       return setImage(FaBeer)
   }

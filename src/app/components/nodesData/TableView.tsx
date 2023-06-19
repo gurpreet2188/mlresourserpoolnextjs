@@ -1,106 +1,112 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import SettingsPanel from './SettingsPanel'
 import { NodeSettingProps } from '@/app/interface/types'
-type TableViewProps = {}
+import { MLResourcePoolREST } from '@/app/helpers/rest'
+import { NodesSettingsStatus } from '@/app/MLResourcePool'
+import NodeNotConnected from './nodeNotConnected'
 
 function TableView ({ id }: NodeSettingProps) {
+  const { nodeSettingsState, nodeSettingsDispatch } =
+    useContext(NodesSettingsStatus)
+  const checkNodeConnected =
+    nodeSettingsState[id].connectedWith === '' ? false : true
+  console.log('setting', checkNodeConnected, nodeSettingsState[id])
+  const [loading, setLoading] = useState(true)
   const [tableData, setTableData] = useState([
     { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' },
-    { Name: 'John', Age: 30, Email: 'john@example.com' },
-    { Name: 'Jane', Age: 25, Email: 'jane@example.com' },
-    { Name: 'Tom', Age: 35, Email: 'tom@example.com' }
+    { Name: 'Jane', Age: 25, Email: 'jane@example.com' }
   ])
-
   const [tableHeader, setTableHeader] = useState(['Name', 'Age', 'Email'])
-
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(2)
+  const [totalPages, setTotalPages] = useState(0)
 
   useEffect(() => {
-    let tempHeader = []
-    Object.keys(tableData).map(v => tempHeader.push(v))
-    setTableHeader(tableHeader)
-  }, [tableData])
+    setLoading(true)
+    const f = async () => {
+      const connectedWith = nodeSettingsState[id].connectedWith
+      const res = await MLResourcePoolREST(
+        '/api/csv-pages',
+        'POST',
+        JSON.stringify({
+          page_number: currentPage,
+          connectedWith: connectedWith
+        })
+      )
+      console.log(res)
 
-  const totalPages = Math.ceil(tableData.length / 10)
-  const indexOfLastEntry = currentPage * 10
-  const indexOfFirstEntry = indexOfLastEntry - 10
-  const currentEntries = tableData.slice(indexOfFirstEntry, indexOfLastEntry)
+      setTableHeader(Object.keys(res.res.page_data[0]))
+      setTotalPages(res.res.total_pages)
+      setTableData(res.res.page_data)
+      setLoading(false)
+    }
+    if (checkNodeConnected) {
+      f()
+    }
+  }, [currentPage, checkNodeConnected])
 
   const Component: React.FC = () => {
-    const handlePageChange = (pageNumber:number) => {
-      setCurrentPage(pageNumber)
+    const pageRef = useRef()
+    const handlePageChange = () => {
+      try {
+        const pageNumber = parseInt(pageRef.current.value)
+        if (pageNumber < 0 && pageNumber > totalPages + 1) {
+          pageRef.current.placeholder = 'Invalid Number '
+        } else {
+          setCurrentPage(pageNumber)
+          pageRef.current.placeholder = `Enter an page number between 1 - ${totalPages}`
+        }
+      } catch (err) {
+        pageRef.current.placeholder = 'Invalid Number Entered'
+      }
     }
-    return (
-      <div className='flex flex-col gap-[1rem] '>
-        <table className='border-spacing-[10px]'>
-          <thead>
-            <tr>
-              {tableHeader.map((header: string) => (
-                <th key={header} className='p-[1rem] border border-white'>
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {currentEntries.map((row, index) => (
-              <tr key={index}>
-                {tableHeader.map((header: string) => (
-                  <td key={header} className='p-[1rem] border border-white'>
-                    {row[header]}
-                  </td>
+    return !checkNodeConnected ? (
+      <NodeNotConnected />
+    ) : (
+      <div className='flex flex-col gap-[1rem] w-[80vw] h-[80vh] overflow-scroll p-[1rem]'>
+        {loading ? (
+          <h1 className='text-3xl text-center self-center place-self-center justify-self-center'>
+            Loading Dataset....
+          </h1>
+        ) : (
+          <>
+            <table className='border-spacing-[10px]'>
+              <thead>
+                <tr>
+                  {tableHeader.map((header: string) => (
+                    <th key={header} className='p-[1rem] border border-white'>
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {tableData.map((row, index) => (
+                  <tr key={index}>
+                    {tableHeader.map((header: string) => (
+                      <td key={header} className='p-[1rem] border border-white'>
+                        {row[header]}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <div className='flex flex-row gap-[1rem] justify-center items-center'>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => handlePageChange(i + 1)}
-              style={{ opacity: currentPage === i + 1 ? 1 : 0.5 }}
-            >
-              {i + 1}
-            </button>
-          ))}
-        </div>
+              </tbody>
+            </table>
+            <form className='flex flex-row gap-[2rem] justify-center items-center'>
+              <input
+                ref={pageRef}
+                className='bg-slate-600 p-[1rem] rounded-md w-[50%]'
+                type='number'
+                placeholder={`Enter an page number between 1 - ${totalPages}`}
+              />
+              <button
+                className='bg-slate-700 p-[1rem]'
+                onClick={handlePageChange}
+              >
+                Submit
+              </button>
+            </form>
+          </>
+        )}
       </div>
     )
   }

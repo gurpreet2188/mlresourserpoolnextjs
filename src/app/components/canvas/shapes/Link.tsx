@@ -55,13 +55,13 @@ function Link ({ id, nodeState, anchorID, setDeleteLink }: LinkPorps) {
 
   const clickHandle = (e: KonvaEventObject<MouseEvent>) => {
     setSelected(!selected)
-    setDeleteLink({ nodeID: id, anchorID: anchorID })
+    setDeleteLink({ nodeID: id, anchorID: anchorID, 'connectedWith': nodeState[id][anchorID].connectedNode })
     // console.log('click')
   }
 
   useEffect(() => {
     if (selected) {
-      setDeleteLink({ nodeID: id, anchorID: anchorID })
+      setDeleteLink({ nodeID: id, anchorID: anchorID, 'connectedWith': nodeState[id][anchorID].connectedNode })
     } else {
       setDeleteLink({ nodeID: "", anchorID: "" })
     }

@@ -49,6 +49,7 @@ export interface AnchorBaseConfig {
     'color': string,
     'connectedWidth': number,
     'connectedHeight': number,
+    'connectedNode'?: string
 
 }
 
@@ -58,6 +59,7 @@ export interface AnchorConfig extends AnchorBaseConfig {
     'anchorDragging': boolean,
     'anchorConnected': boolean,
     'anchorProximity': boolean,
+   
     // [key:string]: 
 }
 
@@ -92,7 +94,6 @@ export interface NodesConfigObjectChild {
     'y': number,
     'staticX': number,
     'staticY': number,
-    'connectedAnchorPoints': Array<string>,
     'toolTip': string,
 
 }
@@ -152,7 +153,7 @@ export type NodeStateAction = { type: 'getNodes'; nodes: NodeState }
 export interface WorkspaceContextTypes {
     nodeState: NodeState,
     nodeDispatch: React.Dispatch<NodeStateAction>,
-    setDeleteLink: React.Dispatch<{nodeID:string, anchorID:string}>
+    setDeleteLink: React.Dispatch<{nodeID:string, anchorID:string, connectedWith: string}>
     workspaceArea: {hit:boolean, x:number,y:number}
     setWorkspaceArea: React.Dispatch<{hit:boolean, x:number,y:number}>
 }
@@ -193,37 +194,51 @@ export interface NodeSettingsState {
     };
     columnFilter: {
       settingsActive: boolean,
+      connectedWith: string,
       columns: ColumnsType
     };
     rowFilter: {
-      settingsActive: boolean;
+      settingsActive: boolean,
+      connectedWith: string,
+      rows: Array<string>
     };
     tableView: {
-      settingsActive: boolean;
+      settingsActive: boolean,
+      connectedWith: string,
     };
     knn: {
-      settingsActive: boolean;
+      settingsActive: boolean,
+      connectedWith: string,
     };
     linearRegression: {
-      settingsActive: boolean;
+      settingsActive: boolean,
+      connectedWith: string,
     };
     decisionTree: {
-      settingsActive: boolean;
+      settingsActive: boolean,
+      connectedWith: string,
     };
     randomForest: {
-      settingsActive: boolean;
+      settingsActive: boolean,
+      connectedWith: string,
+    };
+    scorer: {
+        settingsActive: boolean,
+        connectedWith: string,
     };
   }
 
 export type NodeSettingsAction =
-| { type: 'csv'; value: boolean }
-| { type: 'columnFilter'; value: boolean }
-| { type: 'rowFilter'; value: boolean }
-| { type: 'tableView'; value: boolean }
-| { type: 'knn'; value: boolean }
-| { type: 'linearRegression'; value: boolean }
-| { type: 'decisionTree'; value: boolean }
-| { type: 'randomForest'; value: boolean }
+| { type: 'all'; value: object }
+| { type: 'csv'; value: object }
+| { type: 'columnFilter'; value: object }
+| { type: 'rowFilter'; value: object }
+| { type: 'tableView'; value: object }
+| { type: 'knn'; value: object }
+| { type: 'linearRegression'; value: object }
+| { type: 'decisionTree'; value: object }
+| { type: 'randomForest'; value: object }
+    | { type: 'scorer'; value: object }
 
 export interface NodeSettingContext {
     nodeSettingsState: NodeSettingsState,

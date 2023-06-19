@@ -77,15 +77,15 @@ function Node ({ id }: NodeProps) {
     // e.target.clearCache()
   }
 
-  useEffect(() => {
-    if (nodeState[id].connectedAnchorPoints.length === 0) {
-      nodeDispatch({
-        type: 'updateNode',
-        nodeID: id,
-        value: { connected: false }
-      })
-    }
-  }, [nodeState[id].connectedAnchorPoints.length])
+  // useEffect(() => {
+  //   if (nodeState[id].connectedAnchorPoints.length === 0) {
+  //     nodeDispatch({
+  //       type: 'updateNode',
+  //       nodeID: id,
+  //       value: { connected: false }
+  //     })
+  //   }
+  // }, [nodeState[id].connectedAnchorPoints.length])
   return (
     <>
       <Group
@@ -117,8 +117,7 @@ function Node ({ id }: NodeProps) {
 
         {nodeState[id].anchors.length > 0 &&
         nodeState[id].active &&
-        nodeDraggin &&
-        nodeState[id].connectedAnchorPoints.length === 0 ? (
+        nodeDraggin ? (
           <AnchorBase id={id} styles={nodeState[id].anchorBaseProperties} />
         ) : (
           <></>

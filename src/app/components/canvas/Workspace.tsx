@@ -1,4 +1,10 @@
-import React, { useState, useEffect, createContext, useReducer } from 'react'
+import React, {
+  useState,
+  useEffect,
+  createContext,
+  useReducer,
+  useContext
+} from 'react'
 // import {block} from 'million/react'
 import { Layer, Stage } from 'react-konva'
 // import Node from './shapes/Node'
@@ -10,7 +16,9 @@ import {
 } from '@/app/interface/types'
 import Sidebar from './Sidebar'
 import MainArea from './WorkspaceArea/MainArea'
-
+import { UserIDContext } from '@/app/[userid]/page'
+import { MLResourcePoolREST } from '@/app/helpers/rest'
+import { NodesSettingsStatus } from '@/app/MLResourcePool'
 
 const initialCommonNodeState: NodeState = {
   dummy: {
@@ -27,7 +35,6 @@ const initialCommonNodeState: NodeState = {
     anchorPointProperties: nodeStyles.anchorPoint,
     nodeRectProperties: nodeStyles.nodeRect,
     linkProperties: nodeStyles.link,
-    connectedAnchorPoints: [],
     toolTip: ''
   }
 }
@@ -36,19 +43,26 @@ export const WorkSpaceContext = createContext<WorkspaceContextTypes>({
   nodeState: initialCommonNodeState,
   nodeDispatch: () => {},
   setDeleteLink: () => {},
-  workspaceArea:{hit:false, x:0,y:0},
-  setWorkspaceArea: ()=>{}
+  workspaceArea: { hit: false, x: 0, y: 0 },
+  setWorkspaceArea: () => {}
 })
 function Workspace () {
+  const { nodeSettingsState, nodeSettingsDispatch } =
+    useContext(NodesSettingsStatus)
   const [workspace, setWorkspace] = useState({
-    width: 0,
     height: 0
   })
-
+  const [userID, port]= useContext(UserIDContext)
+  const [timeStamp, setTimeStamp] = useState<number>()
   const [nodes, setNodes] = useState<NodeState>(initialCommonNodeState)
   const [nodeState, nodeDispatch] = useReducer(reducer, nodes)
-  const [workspaceArea, setWorkspaceArea] = useState({hit:false, x:0,y:0})
-  const [deleteLink, setDeleteLink] = useState({ nodeID: '', anchorID: '' })
+  // console.log(nodeState)
+  const [workspaceArea, setWorkspaceArea] = useState({ hit: false, x: 0, y: 0 })
+  const [deleteLink, setDeleteLink] = useState({
+    nodeID: '',
+    anchorID: '',
+    connectedWith: ''
+  })
   useEffect(() => {
     if (window) {
       setWorkspace({
@@ -165,7 +179,7 @@ function Workspace () {
           }
         }
 
-        case 'updateNodeRectProperties':
+      case 'updateNodeRectProperties':
         return {
           ...state,
           [action.nodeID]: {
@@ -183,9 +197,27 @@ function Workspace () {
   }
 
   useEffect(() => {
-    if (Object.keys(nodes).length === Object.keys(nodeConfig).length) {
-      nodeDispatch({ type: 'setNodes', nodes: nodes })
+    const checkUserConfig = async () => {
+      const result: object = await MLResourcePoolREST(
+        '/api/load-user-config',
+        'POST',
+        JSON.stringify({ userID: userID })
+      )
+      // console.log(result)
+      if (result.userConfig) {
+       
+        nodeDispatch({ type: 'setNodes', nodes: result.config })
+        nodeSettingsDispatch({
+          type: 'all',
+          value: result.settings
+        })
+      } else {
+        // if (verifyNodes()) {
+        nodeDispatch({ type: 'setNodes', nodes: nodes })
+        // }
+      }
     }
+    checkUserConfig()
   }, [nodes])
 
   const verifyNodes = () => {
@@ -201,11 +233,35 @@ function Workspace () {
           anchorID: deleteLink.anchorID,
           value: { anchorConnected: false }
         })
+        nodeSettingsDispatch({
+          type: deleteLink.connectedWith,
+          value: { connectedWith: '' }
+        })
       }
-      console.log('delete')
-      setDeleteLink({ nodeID: '', anchorID: '' })
+      // console.log('setting', deleteLink)
+      setDeleteLink({ nodeID: '', anchorID: '', connectedWith: '' })
     }
   }
+
+  useEffect(() => {
+    if (verifyNodes()) {
+      const saveConfigInterval = setInterval(
+        () =>
+          MLResourcePoolREST(
+            'api/save-user-config',
+            'POST',
+            JSON.stringify({
+              userID: userID,
+              config: nodeState,
+              settings: nodeSettingsState
+            })
+          ),
+        5000
+      )
+
+      return () => clearInterval(saveConfigInterval)
+    }
+  }, [nodeState, nodeSettingsState])
 
   // console.log(workspaceArea)
   return (
@@ -224,7 +280,11 @@ function Workspace () {
                 }}
               >
                 <Sidebar width={workspace.width} height={workspace.height} />
-                {workspaceArea.hit ? <MainArea width={workspace.width} height={workspace.height} /> : <></>}
+                {workspaceArea.hit ? (
+                  <MainArea width={workspace.width} height={workspace.height} />
+                ) : (
+                  <></>
+                )}
               </WorkSpaceContext.Provider>
             </>
           ) : null}
