@@ -1,0 +1,39 @@
+version: "2.2"
+
+services:
+  
+      
+  ml:
+      container_name: ml
+      cpus: "2"
+      build: .
+      command: bash -c "uvicorn main:main --host 0.0.0.0 --port 8000"
+      volumes:
+        - .:/app
+      ports:
+        - 8000:8000
+      restart: always
+      # deploy:
+      #   resources:
+      #     limits:
+      #       cpus: 2
+      #       # memory: 512M
+      #     reservations:
+      #       cpus: 2
+      #       # memory: 128M
+      
+  redis:
+      container_name: redis
+      image: redis:7.0.11-alpine
+      
+  celery_worker:
+      container_name: celery_worker
+      cpus: "2"
+      build: .
+      working_dir: /app
+      command: celery -A mlcelery worker --loglevel=info
+      volumes:
+        - .:/app
+      depends_on:
+        - ml
+        - redis

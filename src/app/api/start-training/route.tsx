@@ -5,7 +5,7 @@ import {MLResourcePoolREST} from "@/app/helpers/rest";
 export async function POST(reqest: Request) {
     const body = await reqest.json()
     try {
-        const taskRes = await MLResourcePoolREST('http://127.0.0.1:8000/start-train', 'POST', JSON.stringify(body))
+        const taskRes = await MLResourcePoolREST(`http://127.0.0.1:${body.port}/start-train`, 'POST', JSON.stringify(body))
         return await NextResponse.json(taskRes)
 
     } catch (e) {

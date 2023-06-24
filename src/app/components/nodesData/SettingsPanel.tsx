@@ -1,6 +1,6 @@
 import { NodesSettingsStatus } from '@/app/MLResourcePool'
 import { NodeSettingContext, NodeSettingProps } from '@/app/interface/types'
-import React, { ReactNode, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { MdClose } from 'react-icons/md'
 // bg
 // rounded corner
@@ -9,7 +9,7 @@ import { MdClose } from 'react-icons/md'
 // save button
 
 
-const SettingsPanel: React.FC<NodeSettingProps> = ({ id, title, children }) => {
+const SettingsPanel: React.FC<NodeSettingProps> = ({ id, title, children, saveBtnClickHandle, showSaveBtn=true, btnText='Submit' }) => {
   const { nodeSettingsState, nodeSettingsDispatch } =
     useContext<NodeSettingContext>(NodesSettingsStatus)
   const [windowProperties, setWindowPorperties] = useState({
@@ -51,7 +51,13 @@ const SettingsPanel: React.FC<NodeSettingProps> = ({ id, title, children }) => {
           </button>
         </div>
 
-        <div>{children}</div>
+        <div className='flex justify-center items-center w-[100%] h-[100%]'>{children}</div>
+        {showSaveBtn && <button
+            onClick={saveBtnClickHandle}
+            className='self-end bg-slate-600 py-[0.5rem] px-[1rem] rounded-lg'
+        >
+          {btnText}
+        </button>}
       </div>
     </div>
   )

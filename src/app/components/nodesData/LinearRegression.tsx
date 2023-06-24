@@ -17,21 +17,23 @@ function LinearRegression({id}) {
     const testSize: React.MutableRefObject<any> = useRef()
     // const fitInterceptOptions = [true, false]
     const imputerOptions = ['mean', 'median', 'most_frequent', 'constant']
+
+    const onClickHandle = () => {
+        nodeSettingsDispatch({
+            type: 'linearRegression',
+            value: {
+                test_size: (testSize.current.value === '' || testSize.current.value <= 0) ?
+                    0.2 : testSize.current.value,
+                settingsActive: false
+            }
+        })
+    }
     const Component: React.FC = () => {
-        const onClickHandle = () => {
-            nodeSettingsDispatch({
-                type: 'linearRegression',
-                value: {
-                    test_size: (testSize.current.value === '' || testSize.current.value <= 0) ?
-                        0.2 : testSize.current.value,
-                    settingsActive: false
-                }
-            })
-        }
+
 
         return (
-            <div className='flex flex-col justify-center items-center w-[30vw] h-[55vh] p-[1rem]'>
-                <form className='flex flex-col justify-start items-start gap-[2rem]'>
+            <div className='flex flex-col justify-center items-center w-[100%] h-[35vh] p-[1rem]'>
+                <form className='flex flex-col justify-center items-center gap-[2rem] w-[100%]'>
                     <SelectionComponent
                         dataArr={columns}
                         description={'Select Target Column'}
@@ -40,16 +42,7 @@ function LinearRegression({id}) {
                             nodeSettingsDispatch({type: 'linearRegression', value: {target_column: e.target.value,}})
                         }}
                     />
-                    {/*<SelectionComponent*/}
-                    {/*    dataArr={fitInterceptOptions}*/}
-                    {/*    description={'Fit Intercept'}*/}
-                    {/*    selectionRef={fitIntercept}*/}
-                    {/*    value={nodeSettingsState[id].fit_intercept}*/}
-                    {/*    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {*/}
-                    {/*        nodeSettingsDispatch({type: 'linearRegression', value: {fit_intercept: e.target.value,}})*/}
-                    {/*    }}*/}
-                    {/*/>*/}
-                    <SelectionComponent
+                    {/* <SelectionComponent
                         dataArr={imputerOptions}
                         description={'Impute Method'}
                         // selectionRef={algorithmRef}
@@ -57,25 +50,19 @@ function LinearRegression({id}) {
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                             nodeSettingsDispatch({type: 'linearRegression', value: {imputer_strategy: e.target.value,}})
                         }}
-                    />
+                    /> */}
                     <InputComponent
-                        description={'Test size, default: 20'}
+                        description={'Enter value for test size, default 0.2, range (0.1 to 0.9)'}
                         inputRef={testSize}
                         placeholder={nodeSettingsState[id].test_size}
                     />
                 </form>
-                <button
-                    onClick={onClickHandle}
-                    className='bg-slate-400 rounded-md p-[1rem] absolute bottom-[1rem] right-[1rem]'
-                >
-                    Save and Close
-                </button>
             </div>
         )
     }
 
     return (
-        <SettingsPanel title='Linear Regression Configuration' id={id}>
+        <SettingsPanel title='Linear Regression Configuration' id={id} saveBtnClickHandle={onClickHandle}>
             {checkNodeConnected ?  <Component/> : <NodeNotConnected/>}
         </SettingsPanel>
     )

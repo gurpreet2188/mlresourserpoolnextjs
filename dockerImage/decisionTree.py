@@ -6,7 +6,7 @@ from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
 # from sklearn.metrics import accuracy_score, confusion_matrix
 # from sklearn.datasets import load_iris
 from training import Classify, Regression
-
+from preprocessing import Preprocessing
 
 class DTR(DecisionTreeRegressor):
     def __init__(self, X, y, splitter='best', max_depth=None, imputer_strategy='mean', min_samples_split=2,
@@ -33,6 +33,7 @@ class DTC(DecisionTreeClassifier):
         self.y = y
 
     def train(self, test_size=0.2):
+       
         classify = Classify(self.X, self.y, self.fit, self.predict, test_size)
         return classify.train()
 
@@ -42,3 +43,9 @@ class DTC(DecisionTreeClassifier):
 # y = iris.target
 # dtc = DTC(X, y, splitter='best', random_state=10)
 # print("iris", dtc.train(test_size=0.3))
+
+
+# preprocess = Preprocessing('./cleaned/rowColumnFilter.csv', targetColumn='RainTomorrow')
+# X, y = preprocess.prepare_data()
+# dtc = DTC(X,y)
+# dtc.train(0.3)

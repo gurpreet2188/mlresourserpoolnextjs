@@ -2,59 +2,75 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import SettingsPanel from './SettingsPanel'
 import { NodesSettingsStatus } from '@/app/MLResourcePool'
 import { MLResourcePoolREST } from '@/app/helpers/rest'
+import {UserIDContext} from "@/app/[userid]/page";
 
 function RowFilter ({ id }) {
+  const [userID, port] = useContext(UserIDContext)
   const inputRef = useRef('')
   const dropCheckBoxRef = useRef()
   const columnSelected = useRef()
   const { nodeSettingsState, nodeSettingsDispatch } =
-    useContext(NodesSettingsStatus)
+      useContext(NodesSettingsStatus)
+  const [columns, setColumns] = useState<Array<string>>(Object.entries(nodeSettingsState.columnFilter.columns)
+      .filter(([k, v]) => v)
+      .map(([v, i]) => v))
+
   const [filteredrows, setFilteredRows] = useState('')
-  const columns = Object.entries(nodeSettingsState.columnFilter.columns)
-    .filter(([k, v]) => v === true)
-    .map(([v, i]) => v)
+
+
+  useEffect(()=>{
+    if(nodeSettingsState[id].connectedWith == 'csv') {
+      setColumns(Object.entries(nodeSettingsState.columnFilter.columns)
+          .map(([v, i]) => v))
+    } else {
+      setColumns(Object.entries(nodeSettingsState.columnFilter.columns)
+          .filter(([k, v]) => v)
+          .map(([v, i]) => v))
+    }
+  },[nodeSettingsState[id].connectedWith])
 
   useEffect(() => {
     columnSelected.current.value = nodeSettingsState[id].rowColumn
     dropCheckBoxRef.current.checked = nodeSettingsState[id].dropNA
     inputRef.current.value = nodeSettingsState[id]['rows'].join(',')
   }, [])
-  const Component: React.FC = () => {
-    const onClickHandle = async () => {
-      let tempValue = inputRef.current.value.replace(/\s+/g, '')
-      // setFilteredRows(tempValue)
-      tempValue = tempValue.split(',')
-      console.log(tempValue)
-      console.log(dropCheckBoxRef.current.checked)
-      console.log(columnSelected.current.value)
-      nodeSettingsDispatch({
-        type: 'rowFilter',
-        value: {
-          rows: tempValue[0] !== '' ? tempValue : [],
-          rowColumn: columnSelected.current.value,
-          dropNA: dropCheckBoxRef.current.checked
-        }
-      })
 
-      nodeSettingsDispatch({
-        type: 'rowFilter',
-        value: { settingsActive: false }
-      })
-      await MLResourcePoolREST(
+
+  const onClickHandle = async () => {
+    let tempValue = inputRef.current.value.replace(/\s+/g, '')
+    // setFilteredRows(tempValue)
+    tempValue = tempValue.split(',')
+    console.log(tempValue)
+    console.log(dropCheckBoxRef.current.checked)
+    console.log(columnSelected.current.value)
+    nodeSettingsDispatch({
+      type: id,
+      value: {
+        rows: tempValue[0] !== '' ? tempValue : [],
+        rowColumn: columnSelected.current.value,
+        dropNA: dropCheckBoxRef.current.checked,
+        settingsActive: false
+      }
+    })
+
+    await MLResourcePoolREST(
         '/api/preprocess',
         'POST',
         JSON.stringify({
+          port:port,
           type: 'row',
           drop: dropCheckBoxRef.current.checked,
           replace: false,
           rowFilter: tempValue[0] !== '' ? tempValue : [],
           rowFilterColumn: columnSelected.current.value
         })
-      )
-    }
+    )
+  }
+
+  const Component: React.FC = () => {
 
     return (
-      <div className='flex felx-row justify-center items-center w-[40vw] h-[45vh] relative'>
+      <div className='flex felx-row justify-center items-center lg:w-[40vw] md:w-[60vw] h-[45vh] relative'>
         <form className='flex flex-row gap-[4rem]'>
           <div className='flex flex-col gap-[2rem] border border-white/50 p-[1rem]'>
             <label htmlFor='selectOption'>Select Column:</label>
@@ -97,18 +113,12 @@ function RowFilter ({ id }) {
             </div>
           </div>
         </form>
-        <button
-          onClick={onClickHandle}
-          className='bg-slate-400 rounded-md p-[1rem] absolute bottom-[0.5rem] right-[0.5rem]'
-        >
-          Save and Close
-        </button>
       </div>
     )
   }
 
   return (
-    <SettingsPanel id={id} title='Row Filter'>
+    <SettingsPanel id={id} title='Row Filter' saveBtnClickHandle={onClickHandle}>
       <Component />
     </SettingsPanel>
   )

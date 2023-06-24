@@ -5,9 +5,10 @@ import MLResourcePool, { NodesSettingsStatus } from '@/app/MLResourcePool'
 import Papa from 'papaparse'
 import { MLResourcePoolREST } from '@/app/helpers/rest'
 import { UserIDContext } from '@/app/[userid]/page'
+import {Spinner} from "@/app/components/common/Spinner";
 
 function CSVUpload ({ id }: NodeSettingProps) {
-  const userID = useContext(UserIDContext)
+  const [userID,port] = useContext(UserIDContext)
   const { nodeSettingsState, nodeSettingsDispatch } =
     useContext<NodeSettingContext>(NodesSettingsStatus)
 
@@ -18,8 +19,8 @@ function CSVUpload ({ id }: NodeSettingProps) {
   const [rowCount, setRowCount] = useState<number>(0)
 
   const fileRef = useRef<HTMLInputElement | null>(null)
-
-
+  const [loading, setLoading] = useState(false)
+  const [uploadMessage, setUploadMessage]= useState("")
 
   function handleFileInputChange (event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.files) {
@@ -28,6 +29,7 @@ function CSVUpload ({ id }: NodeSettingProps) {
       const reader = new FileReader()
       reader.onload = function (e) {
         if (e.target) {
+
           const csvData = e.target.result
           Papa.parse(csvData, {
             complete: async function (results) {
@@ -58,27 +60,35 @@ function CSVUpload ({ id }: NodeSettingProps) {
           })
         }
       }
+      if(file['name'].split('.').pop() === 'csv'){
+        reader.readAsText(file)
+      } else {
+        setErrorMessage(true)
+      }
 
-      reader.readAsText(file)
     }
   }
   const fileSubmitHandle = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    await MLResourcePoolREST('/api/send-csv-backend', 'POST', JSON.stringify({userID:userID}))
-    // const csvFile = fileRef.current
+    setLoading(true)
+    const res = await MLResourcePoolREST('/api/send-csv-backend', 'POST', JSON.stringify({userID:userID,port:port}))
 
-    // const formData = new FormData()
-    // formData.append('file', csvFile.files[0])
-    // try {
-    // } catch (error) {
-    //   console.log(error)
-    // }
+    if(res['msg']==='done'){
+      setUploadMessage("File Uploaded")
+      setTimeout(()=>{
+        setLoading(false)
+        nodeSettingsDispatch({type:'csv', value:{'settingsActive': false}})
+      },1000)
+    } else {
+      setLoading(false)
+      setUploadMessage("Error uploading file, is backend connected?")
+    }
   }
 
   const CSVComponent: React.FC = () => {
     return (
       <div className='flex flex-col gap-[1rem]'>
-        <form onSubmit={fileSubmitHandle} className='flex flex-col gap-[1rem] '>
+        <form className='flex flex-col gap-[1rem] '>
           <label htmlFor='fileUpload' className='text-xl'>
             Upload Dataset in CSV format.
           </label>
@@ -96,12 +106,7 @@ function CSVUpload ({ id }: NodeSettingProps) {
               ? `CSV loaded, found ${columnCount} columns and ${rowCount} Rows`
               : ''}
           </p>
-          <button
-            type='submit'
-            className='self-end bg-slate-600 p-[1rem] rounded-lg'
-          >
-            Submit
-          </button>
+
         </form>
         <p
           className='text-red-400'
@@ -109,13 +114,19 @@ function CSVUpload ({ id }: NodeSettingProps) {
         >
           Invalid CSV File.
         </p>
+        <p
+            className='text-white'
+        >
+          Upload Status : {uploadMessage}
+        </p>
+        {loading && <Spinner size={'2rem'}/>}
       </div>
     )
   }
 
   return (
     <div>
-      <SettingsPanel title={'CSV Upload'} id={id}>
+      <SettingsPanel title={'CSV Upload'} id={id} saveBtnClickHandle={fileSubmitHandle}>
         <CSVComponent />
       </SettingsPanel>
     </div>

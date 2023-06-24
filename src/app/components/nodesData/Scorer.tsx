@@ -4,8 +4,10 @@ import SettingsPanel from './SettingsPanel'
 import {NodesSettingsStatus} from '@/app/MLResourcePool'
 import {Input} from "postcss";
 import {MLResourcePoolREST} from "@/app/helpers/rest";
+import {UserIDContext} from "@/app/[userid]/page";
 
 function Scorer({id}) {
+    const [userID, port] = useContext(UserIDContext)
     const {nodeSettingsState, nodeSettingsDispatch} =
         useContext(NodesSettingsStatus)
     const [accuracy, setAccuracy] = useState("Loading..")
@@ -23,14 +25,14 @@ function Scorer({id}) {
         const filterIDOne = nodeSettingsState[mlAlogID].connectedWith
         let filterIDTwo = ''
         let csvID = ''
-        if (nodeSettingsState[filterIDOne].connectedWith !== 'csv') {
-            filterIDTwo = nodeSettingsState[filterIDOne].connectedWith
-            if (nodeSettingsState[filterIDTwo].connectedWith === 'csv') {
+        if (nodeSettingsState[filterIDOne]?.connectedWith !== 'csv') {
+            filterIDTwo = nodeSettingsState[filterIDOne]?.connectedWith
+            if (nodeSettingsState[filterIDTwo]?.connectedWith === 'csv') {
                 allNodesConnected = true
             }
 
         } else {
-            if (nodeSettingsState[filterIDOne].connectedWith === 'csv') {
+            if (nodeSettingsState[filterIDOne]?.connectedWith === 'csv') {
                 allNodesConnected = true
             }
         }
@@ -50,6 +52,7 @@ function Scorer({id}) {
         setPending(true)
         if (check) {
             const finalPreprocessObj = {
+                port:port,
                 type: 'combine',
                 targetColumn: nodeSettingsState[mlAlgo].target,
                 columns: nodeSettingsState.columnFilter.connectedWith !== '' ? nodeSettingsState.columnFilter.ignoredCols : [],
@@ -59,7 +62,7 @@ function Scorer({id}) {
                 rowFilterColumn: nodeSettingsState.rowFilter.rowColumn
             }
 
-            const mlConfig = nodeSettingsState[mlAlgo]
+            const mlConfig = {...nodeSettingsState[mlAlgo], port:port}
             const preprocessRes = await MLResourcePoolREST('/api/preprocess',
                 'POST',
                 JSON.stringify(finalPreprocessObj))
@@ -75,8 +78,8 @@ function Scorer({id}) {
                     const taskCheckInterval = setInterval(async () => {
                         MLResourcePoolREST('/api/track-training-progress',
                             'POST',
-                            JSON.stringify({taskID: taskRes.taskID})).then((response) => {
-                            console.log(response)
+                            JSON.stringify({taskID: taskRes.taskID, port:port})).then((response) => {
+                            console.log('res',response)
                             if (response.task_status === 'SUCCESS') {
                                 setRes(response)
                                 clearInterval(taskCheckInterval)
@@ -102,31 +105,22 @@ function Scorer({id}) {
 
     }
 
-    console.log(res)
     const Component: React.FC = () => {
 
         return (
-            <div className='flex flex-row gap-[2rem] justify-center items-center w-[50vw] h-[55vh] p-[1rem]'>
+            <div className='flex flex-row gap-[2rem] justify-center items-center w-[45vw] h-[55vh] p-[1rem]'>
 
-                {pending ? <Spinner/> : <>
+                {pending ? <Spinner/> : <div className='flex justify-center items-center gap-[2rem] w-[100%]'>
                     {mlType === 'classify' && <ConfusionMatrix res={res}/>}
                     <div
-                        className='flex flex-col justify-center items-center w-[25%] h-[25%] p-[1rem] border border-white/50'>
+                        className='flex flex-col justify-center items-center w-[35%] h-[45%] p-[1rem] border border-white/50'>
                         <h2 className="text-2xl">Accuracy</h2>
                         <p className="text-xl">{
                             res.task_result.accuracy === 'FAILED' ?
                                 "Something went wrong" :
                                 res.task_result.accuracy === 'calc' ? " " : `${parseFloat(res.task_result.accuracy).toFixed(2)}%`}</p>
                     </div>
-                </>}
-                <button
-                    onClick={onClickHandle}
-                    className='bg-slate-400 rounded-md p-[1rem] absolute bottom-[1rem] right-[1rem]'
-                >
-                    Start Training
-                </button>
-
-
+                </div>}
             </div>
 
 
@@ -134,7 +128,7 @@ function Scorer({id}) {
     }
 
     return (
-        <SettingsPanel title='KNN Configuration' id={id}>
+        <SettingsPanel title='ML Training' id={id} saveBtnClickHandle={onClickHandle} btnText='Start training'>
             <Component/>
         </SettingsPanel>
     )

@@ -4,13 +4,15 @@ import { NodeSettingProps } from '@/app/interface/types'
 import { MLResourcePoolREST } from '@/app/helpers/rest'
 import { NodesSettingsStatus } from '@/app/MLResourcePool'
 import NodeNotConnected from './nodeNotConnected'
+import {UserIDContext} from "@/app/[userid]/page";
 
 function TableView ({ id }: NodeSettingProps) {
+  const [userID,port] = useContext(UserIDContext)
   const { nodeSettingsState, nodeSettingsDispatch } =
     useContext(NodesSettingsStatus)
   const checkNodeConnected =
     nodeSettingsState[id].connectedWith === '' ? false : true
-  console.log('setting', checkNodeConnected, nodeSettingsState[id])
+
   const [loading, setLoading] = useState(true)
   const [tableData, setTableData] = useState([
     { Name: 'John', Age: 30, Email: 'john@example.com' },
@@ -19,6 +21,7 @@ function TableView ({ id }: NodeSettingProps) {
   const [tableHeader, setTableHeader] = useState(['Name', 'Age', 'Email'])
   const [currentPage, setCurrentPage] = useState(2)
   const [totalPages, setTotalPages] = useState(0)
+  const [errorMsg , setErrorMsg] = useState("Loading Dataset....")
 
   useEffect(() => {
     setLoading(true)
@@ -28,16 +31,21 @@ function TableView ({ id }: NodeSettingProps) {
         '/api/csv-pages',
         'POST',
         JSON.stringify({
+          port: port,
           page_number: currentPage,
           connectedWith: connectedWith
         })
       )
-      console.log(res)
 
-      setTableHeader(Object.keys(res.res.page_data[0]))
-      setTotalPages(res.res.total_pages)
-      setTableData(res.res.page_data)
-      setLoading(false)
+      if(res.msg === "failed") {
+        setLoading(true)
+        setErrorMsg("Backend disconnected")
+      }else {
+        setTableHeader(Object.keys(res.res.page_data[0]))
+        setTotalPages(res.res.total_pages)
+        setTableData(res.res.page_data)
+        setLoading(false)
+      }
     }
     if (checkNodeConnected) {
       f()
@@ -62,10 +70,10 @@ function TableView ({ id }: NodeSettingProps) {
     return !checkNodeConnected ? (
       <NodeNotConnected />
     ) : (
-      <div className='flex flex-col gap-[1rem] w-[80vw] h-[80vh] overflow-scroll p-[1rem]'>
+      <div className='flex flex-col gap-[1rem] w-[80vw] md:h-[60vh] lg:h-[77vh] h-[70%] overflow-scroll z-20 p-[1rem]'>
         {loading ? (
           <h1 className='text-3xl text-center self-center place-self-center justify-self-center'>
-            Loading Dataset....
+            {errorMsg}
           </h1>
         ) : (
           <>
@@ -112,7 +120,7 @@ function TableView ({ id }: NodeSettingProps) {
   }
 
   return (
-    <SettingsPanel title={'Table View'} id={id}>
+    <SettingsPanel title={'Table View'} id={id} showSaveBtn={false}>
       <Component />
     </SettingsPanel>
   )

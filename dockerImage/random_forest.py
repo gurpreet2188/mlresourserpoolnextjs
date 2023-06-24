@@ -24,7 +24,7 @@ class RFC(RandomForestClassifier):
                  min_samples_leaf=1, random_state=None):
         super().__init__(n_estimators=n_estimators, max_depth=max_depth,
                          min_samples_split=min_samples_split, min_samples_leaf=min_samples_leaf,
-                         random_state=random_state)
+                         random_state=random_state, criterion='entropy')
         self.X = X
         self.y = y
 

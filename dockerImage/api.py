@@ -133,6 +133,7 @@ class API(FastAPI):
         body = await request.json()
         try:
             task_result = AsyncResult(body['taskID'], app=train)
+            print(task_result.get())
             result = {
                 "task_id": body['taskID'],
                 "task_status": task_result.status,

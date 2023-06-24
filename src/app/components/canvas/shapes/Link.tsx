@@ -55,7 +55,12 @@ function Link ({ id, nodeState, anchorID, setDeleteLink }: LinkPorps) {
 
   const clickHandle = (e: KonvaEventObject<MouseEvent>) => {
     setSelected(!selected)
-    setDeleteLink({ nodeID: id, anchorID: anchorID, 'connectedWith': nodeState[id][anchorID].connectedNode })
+    if(selected){
+      setDeleteLink({ nodeID: id, anchorID: anchorID, connectedWith: nodeState[id][anchorID].connectedNode })
+    }else {
+      setDeleteLink({ nodeID: "", anchorID: "", connectedWith: "" })
+    }
+
     // console.log('click')
   }
 
@@ -82,11 +87,12 @@ function Link ({ id, nodeState, anchorID, setDeleteLink }: LinkPorps) {
       }
       bezier
       onClick={clickHandle}
+      onTouchStart={clickHandle}
       x={nodeState[id].anchorBaseProperties.x}
       y={nodeState[id].anchorBaseProperties.y}
       points={points}
       stroke={selected ? "#a0a0a0" : "#ffffff"}
-      strokeWidth={selected ? 6 : 4}
+      strokeWidth={selected ? 8 : 6}
     />
   )
 }

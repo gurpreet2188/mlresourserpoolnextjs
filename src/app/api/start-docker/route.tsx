@@ -8,7 +8,7 @@ import {exec} from "child_process";
 
 export async function POST(reqest: Request) {
     const body = await reqest.json()
-    const file = path.join(process.cwd(), `/users/${body.userID}` + `/${body.userID}.yml`)
+    const file = path.join(process.cwd(), `/dockerImage` + `/${body.userID}.yml`)
     let checkFile = false
 
     try {

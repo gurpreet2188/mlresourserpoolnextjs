@@ -60,12 +60,13 @@ export const nodeConfig: NodeConfig = {
         anchors: ["csv1", "csv2"],
         anchorPoint: false,
         acceptedNodes: ['columnFilter', 'rowFilter', 'tableView'],
-        nodeColor: "#cdb4db",
+        nodeColor: "#d0f4de",
         x: 100,
         y: 100,
         staticX: 100,
         staticY: 100,
-       
+        sideBarX: 0,
+        sideBarY: 0,
         toolTip: ""
     },
     columnFilter: {
@@ -77,12 +78,13 @@ export const nodeConfig: NodeConfig = {
         icon: 'GrColumns',
         anchorPoint: true,
         acceptedNodes: ['rowFilter', 'tableView','knn', 'linearRegression','decisionTree','randomForest'],
-        nodeColor: "#ffc8dd",
+        nodeColor: "#d0f4de",
         x: 100,
         y: 200,
         staticX: 100,
         staticY: 200,
-       
+        sideBarX: 0,
+        sideBarY: 0,
         toolTip: ""
     },
 
@@ -95,12 +97,13 @@ export const nodeConfig: NodeConfig = {
         icon: 'LuRows',
         anchorPoint: true,
         acceptedNodes: ['columnFilter', 'tableView', 'knn', 'linearRegression','decisionTree','randomForest'],
-        nodeColor: "#ffafcc",
+        nodeColor: "#d0f4de",
         x: 100,
         y: 200,
         staticX: 100,
         staticY: 200,
-       
+        sideBarX: 0,
+        sideBarY: 0,
         toolTip: ""
     },
     tableView: {
@@ -112,12 +115,13 @@ export const nodeConfig: NodeConfig = {
         icon: 'GrTable',
         anchorPoint: true,
         acceptedNodes: [],
-        nodeColor: "#a2d2ff",
+        nodeColor: "#d0f4de",
         x: 100,
         y: 100,
         staticX: 100,
         staticY: 100,
-       
+        sideBarX: 0,
+        sideBarY: 0,
         toolTip: ""
     },
 
@@ -132,12 +136,13 @@ export const nodeConfig: NodeConfig = {
         icon: 'BiScatterChart',
         anchorPoint: true,
         acceptedNodes: ['scorer'],
-        nodeColor: "#a2d2ff",
+        nodeColor: "#e4c1f9",
         x: 100,
         y: 380,
         staticX: 100,
         staticY: 380,
-       
+        sideBarX: 0,
+        sideBarY: 0,
         toolTip: ""
     },
     linearRegression: {
@@ -149,12 +154,13 @@ export const nodeConfig: NodeConfig = {
         icon: 'MdAutoGraph',
         anchorPoint: true,
         acceptedNodes: ['scorer'],
-        nodeColor: "#a2d2ff",
+        nodeColor: "#e4c1f9",
         x: 100,
         y: 380,
         staticX: 100,
         staticY: 380,
-       
+        sideBarX: 0,
+        sideBarY: 0,
         toolTip: ""
     },
     decisionTree: {
@@ -166,12 +172,13 @@ export const nodeConfig: NodeConfig = {
         icon: 'GrTreeOption',
         anchorPoint: true,
         acceptedNodes: ['scorer'],
-        nodeColor: "#a2d2ff",
+        nodeColor: "#e4c1f9",
         x: 100,
         y: 480,
         staticX: 100,
         staticY: 480,
-       
+        sideBarX: 0,
+        sideBarY: 0,
         toolTip: ""
     },
     randomForest: {
@@ -183,12 +190,13 @@ export const nodeConfig: NodeConfig = {
         icon: 'MdOutlineForest',
         anchorPoint: true,
         acceptedNodes: ['scorer'],
-        nodeColor: "#a2d2ff",
+        nodeColor: "#e4c1f9",
         x: 100,
         y: 480,
         staticX: 100,
         staticY: 480,
-       
+        sideBarX: 0,
+        sideBarY: 0,
         toolTip: ""
     },
     scorer: {
@@ -200,12 +208,13 @@ export const nodeConfig: NodeConfig = {
         icon: 'MdSportsScore',
         anchorPoint: true,
         acceptedNodes: [],
-        nodeColor: "#a2d2ff",
+        nodeColor: "#e4c1f9",
         x: 100,
         y: 580,
         staticX: 100,
         staticY: 580,
-
+        sideBarX: 0,
+        sideBarY: 0,
         toolTip: ""
     },
 

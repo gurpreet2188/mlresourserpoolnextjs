@@ -1,12 +1,12 @@
 from celery import Celery
-# import os, time
+import os, time
 from knn import KNNClassifier, KNNRegressor
 from linearRegression import LR
 from decisionTree import DTC, DTR
 from random_forest import RFC, RFR
 from preprocessing import Preprocessing
 
-celery = Celery('tasks', broker="redis://0.0.0.0:6379/0", backend="redis://0.0.0.0:6379/0")
+celery = Celery('tasks', broker="redis://redis:6379/0", backend="redis://redis:6379/0")
 
 
 # app = Celery(__name__)
@@ -25,13 +25,15 @@ def train(mlConfig):
     if (mlConfig['type'] == 'knn_regress'):
 
         mlConfig['leaf_size'] = int(mlConfig['leaf_size'])
+        mlConfig['n_neighbors'] = int(mlConfig['n_neighbors'])
         mlModel = KNNRegressor(X, y, weights=mlConfig['weights'], leaf_size=mlConfig['leaf_size'],
-                               imputer_strategy=mlConfig['imputer_strategy'])
+                               imputer_strategy=mlConfig['imputer_strategy'], n_neighbors=mlConfig['n_neighbors'])
         return mlModel.train(test_size=mlConfig['test_size'])
 
     elif (mlConfig['type'] == 'knn_classify'):
         mlConfig['leaf_size'] = int(mlConfig['leaf_size'])
-        mlModel = KNNClassifier(X, y, weights=mlConfig['weights'], leaf_size=mlConfig['leaf_size'])
+        mlConfig['n_neighbors'] = int(mlConfig['n_neighbors'])
+        mlModel = KNNClassifier(X, y, weights=mlConfig['weights'], leaf_size=mlConfig['leaf_size'], n_neighbors=mlConfig['n_neighbors'])
         return mlModel.train(test_size=mlConfig['test_size'])
 
     elif (mlConfig['type'] == 'linear_regress'):

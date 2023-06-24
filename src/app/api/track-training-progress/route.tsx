@@ -5,7 +5,7 @@ import {MLResourcePoolREST} from "@/app/helpers/rest";
 export async function POST(reqest: Request) {
     const body = await reqest.json()
     try {
-        const combineRes = await MLResourcePoolREST('http://127.0.0.1:8000/track-ml-progress', 'POST', JSON.stringify(body))
+        const combineRes = await MLResourcePoolREST(`http://127.0.0.1:${body.port}/track-ml-progress`, 'POST', JSON.stringify(body))
         return await NextResponse.json(combineRes)
 
     } catch (e) {

@@ -49,6 +49,7 @@ function ImageIcon ({ id, iconName, active }: imageIconTypes) {
           x={active ? 30 : 60}
           y={active ? 35 : 42}
           onClick={closeButtonHandle}
+          onTouchStart={closeButtonHandle}
         />
       </>
     )

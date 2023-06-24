@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
-
+from sklearn.model_selection import KFold, cross_val_score , cross_val_predict
 
 class Regression:
     def __init__(self, X, y, fit, predict, split=0.2, imputer_strategy='mean'):
@@ -29,23 +29,22 @@ class Regression:
 
 
 class Classify:
-    def __init__(self, X, y, fit, predict, split=0.2):
+    def __init__(self, X, y, fit, predict, split=0.2, cv=3):
         self.X = X
         self.y = y
         self.fit = fit
         self.predict = predict
         self.split = split
+        self.n_splits = cv
 
     def train(self):
         X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, test_size=self.split)
         print(X_train.shape[1])
-        # scaler = StandardScaler(with_mean=False)
-        # X_train = scaler.fit_transform(X_train)
-        # X_test = scaler.transform(X_test)
-        self.fit(X_train, y_train.values.ravel())
-        predictions = self.predict(X_test)
-        accuracy = accuracy_score(y_test, predictions)
-        cm = confusion_matrix(y_test, predictions)
+        model = self.fit(X_train, y_train.values.ravel())
+        cv = KFold(n_splits=self.n_splits, random_state=1, shuffle=True)
+        accuracy = cross_val_score(model,self.X, self.y, cv=cv, scoring='accuracy').mean()
+        y_pred = cross_val_predict(model, self.X, self.y, cv=cv)
+        cm = confusion_matrix(self.y, y_pred)
         cm = cm.tolist()
-
+        print(accuracy, cm)
         return {'cm': cm, 'accuracy': accuracy * 100}

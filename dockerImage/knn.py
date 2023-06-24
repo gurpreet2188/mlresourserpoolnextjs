@@ -8,8 +8,8 @@ from training import Classify, Regression
 
 class KNNRegressor(KNeighborsRegressor):
     def __init__(self, X, y, weights='uniform', algorithm='auto', leaf_size=30,
-                 imputer_strategy='mean'):
-        super().__init__(weights=weights, algorithm=algorithm, leaf_size=leaf_size)
+                 imputer_strategy='mean', n_neighbors=5):
+        super().__init__(weights=weights, algorithm=algorithm, leaf_size=leaf_size, n_neighbors=n_neighbors)
         self.X = X
         self.y = y
         self.imputer_strategy = imputer_strategy
@@ -21,8 +21,8 @@ class KNNRegressor(KNeighborsRegressor):
 
 
 class KNNClassifier(KNeighborsClassifier):
-    def __init__(self, X, y, weights='uniform', algorithm='auto', leaf_size=30):
-        super().__init__(weights=weights, algorithm=algorithm, leaf_size=leaf_size)
+    def __init__(self, X, y, weights='uniform', algorithm='auto', leaf_size=30, n_neighbors=5):
+        super().__init__(weights=weights, algorithm=algorithm, leaf_size=leaf_size, n_neighbors=n_neighbors)
         self.X = X
         self.y = y
 

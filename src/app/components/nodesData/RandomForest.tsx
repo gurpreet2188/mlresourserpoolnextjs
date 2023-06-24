@@ -16,24 +16,25 @@ function RandomForest({id}) {
   const columns = Object.entries(nodeSettingsState.columnFilter.columns)
       .filter(([k, v]) => v)
       .map(([v, i]) => v)
-  const imputerOptions = ['mean', 'median', 'most_frequent', 'constant']
+  // const imputerOptions = ['mean', 'median', 'most_frequent', 'constant']
   const types = ['rf_classify', 'rf_regress']
-
-  const Component:React.FC = ()=>{
     const onClickHandle = () => {
-      nodeSettingsDispatch({
-        type: 'linearRegression',
-        value: {
-          test_size: (testSize.current.value === '' || testSize.current.value <= 0) ?
-              0.2 : testSize.current.value,
-            n_estimators: nEstimator.current.value,
-          settingsActive: false
-        }
-      })
+        nodeSettingsDispatch({
+            type: id,
+            value: {
+                test_size: (testSize.current.value === '' || testSize.current.value <= 0) ?
+                    0.2 : testSize.current.value,
+                n_estimators: nEstimator.current.value !== '' ? nEstimator.current.value : 100,
+                random_state: randomStateRef.current.value !== '' ? randomStateRef.current.value : null,
+                settingsActive: false
+            }
+        })
     }
+  const Component:React.FC = ()=>{
+
     return(
-        <div className='flex flex-col justify-center items-center w-[30vw] h-[60vh] p-[1rem]'>
-          <form className='flex flex-col justify-start items-start gap-[2rem]'>
+        <div className='flex flex-col justify-center items-center w-[100%] h-[60vh] p-[1rem]'>
+          <form className='flex flex-col justify-start items-start gap-[2rem] w-[100%]'>
             <SelectionComponent
                 dataArr={types}
                 description={'Select Model Type'}
@@ -50,7 +51,7 @@ function RandomForest({id}) {
                   nodeSettingsDispatch({type: id, value: {target_column: e.target.value,}})
                 }}
             />
-            <SelectionComponent
+            {/* <SelectionComponent
                 dataArr={imputerOptions}
                 disable={nodeSettingsState[id].type == 'rf_classify' && true}
                 description={'Impute Method (Regression)'}
@@ -59,7 +60,7 @@ function RandomForest({id}) {
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                   nodeSettingsDispatch({type: id, value: {imputer_strategy: e.target.value,}})
                 }}
-            />
+            /> */}
             <InputComponent
                 description={'Random State, default: None'}
                 inputRef={randomStateRef}
@@ -75,22 +76,16 @@ function RandomForest({id}) {
             <InputComponent
                 description={'Test size, default: 20'}
                 inputRef={testSize}
-                placeholder={nodeSettingsState[id].random_state}
+                placeholder={nodeSettingsState[id].test_size}
             />
 
           </form>
-          <button
-              onClick={onClickHandle}
-              className='bg-slate-400 rounded-md p-[1rem] absolute bottom-[1rem] right-[1rem]'
-          >
-            Save and Close
-          </button>
         </div>
     )
   }
 
   return (
-      <SettingsPanel title='Linear Regression Configuration' id={id}>
+      <SettingsPanel title='Random Forest Configuration' id={id} saveBtnClickHandle={onClickHandle}>
         {checkNodeConnected ?  <Component/> : <NodeNotConnected/>}
       </SettingsPanel>
   )

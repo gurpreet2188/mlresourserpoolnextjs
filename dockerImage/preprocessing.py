@@ -62,18 +62,18 @@ class Preprocessing:
         #     pass
 
         self.y = self.X[self.targetColumn]
-
+        self.X = self.X.drop(self.targetColumn, axis=1 )
         # if len(self.columnFilter) > 0:
         #     self.X = self.X.drop(self.columnFilter, axis=1)
 
-        df = pd.DataFrame(self.X)
-        columnRename = {self.targetColumn : f"target_{self.targetColumn}"}
+        # df = pd.DataFrame(self.X)
+        # columnRename = {self.targetColumn : f"target_{self.targetColumn}"}
         # for col in self.targetColumn:
         #     columnRename[col] = f"target_{col}"
         # print(columnRename)
         # df.rename(columnRename, axis='columns', inplace=True)
 
-        df.rename(columnRename, axis='columns', inplace=True)
+        # df.rename(columnRename, axis='columns', inplace=True)
         # df.to_csv('./cleaned/csvReady.csv', encoding='utf-8')
         # find non-number columns
         nonNumberCols = []

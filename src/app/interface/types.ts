@@ -94,6 +94,8 @@ export interface NodesConfigObjectChild {
     'y': number,
     'staticX': number,
     'staticY': number,
+    sideBarX: number,
+    sideBarY: number,
     'toolTip': string,
 
 }

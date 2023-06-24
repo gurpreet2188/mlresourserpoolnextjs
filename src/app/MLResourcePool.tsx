@@ -13,6 +13,7 @@ const initialNodeSettingsStatus = {
     columnFilter: {
         settingsActive: false,
         connectedWith: '',
+        connectedAnchorID: '',
         columns: {col1: true, col2: true, col3: true},
         ignoredCols: []
     },
@@ -21,24 +22,29 @@ const initialNodeSettingsStatus = {
     knn: {
         settingsActive: false,
         connectedWith: '',
+        connectedAnchorID: '',
         target_column: '',
         type: 'knn_classify',
         algorithm: 'auto',
         weights: 'uniform',
         leaf_size: 30,
-        test_size:0.2
+        test_size: 0.2,
+        n_neighbors:5
     },
     linearRegression: {
         settingsActive: false,
         connectedWith: '',
+        connectedAnchorID: '',
         target_column: '',
         type: 'linear_regress',
         fit_intercept: true,
         imputer_strategy: 'mean',
-        test_size:0.2
+        test_size: 0.2
     },
     decisionTree: {
-        settingsActive: false, connectedWith: '',
+        settingsActive: false,
+        connectedWith: '',
+        connectedAnchorID: '',
         target_column: '',
         type: 'dt_classify',
         splitter: 'best',
@@ -47,19 +53,22 @@ const initialNodeSettingsStatus = {
         min_samples_split: 10,
         min_samples_leaf: 10,
         random_state: null,
-        test_size:0.2
+        test_size: 0.2
 
     },
-    randomForest: {settingsActive: false, connectedWith: '',
+    randomForest: {
+        settingsActive: false,
+        connectedWith: '',
+        connectedAnchorID: '',
         target_column: '',
         type: 'rf_classify',
         n_estimators: 100,
         max_depth: null,
         imputer_strategy: 'mean',
-        min_samples_split:2,
-        min_samples_leaf:1,
+        min_samples_split: 2,
+        min_samples_leaf: 1,
         random_state: null,
-        test_size:0.2
+        test_size: 0.2
     },
     scorer: {settingsActive: false, connectedWith: '',}
 }
