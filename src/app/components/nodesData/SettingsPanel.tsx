@@ -9,7 +9,7 @@ import { MdClose } from 'react-icons/md'
 // save button
 
 
-const SettingsPanel: React.FC<NodeSettingProps> = ({ id, title, children, saveBtnClickHandle, showSaveBtn=true, btnText='Submit' }) => {
+const SettingsPanel: React.FC<NodeSettingProps> = ({ id, title, children, saveBtnClickHandle, showSaveBtn=true, btnText='Submit', closebtntype='settings' }) => {
   const { nodeSettingsState, nodeSettingsDispatch } =
     useContext<NodeSettingContext>(NodesSettingsStatus)
   const [windowProperties, setWindowPorperties] = useState({
@@ -35,7 +35,12 @@ const SettingsPanel: React.FC<NodeSettingProps> = ({ id, title, children, saveBt
   }, [])
 
   const closeButtonHandle = () =>{
-    nodeSettingsDispatch({type:id, value: {settingsActive: false}})
+    if(closebtntype ==='settings'){
+      nodeSettingsDispatch({type:id, value: {settingsActive: false}})
+    } else  {
+      nodeSettingsDispatch({type:id,value:{helpMessage: false}})
+    }
+
   }
   return (
     <div

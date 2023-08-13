@@ -3,7 +3,7 @@ import yaml from 'js-yaml'
 import {NextResponse} from 'next/server'
 import path from 'path'
 
-export async function POST(reqest: Request) {
+export async function POST(reqest: Request): Promise<NextResponse> {
     const body = await reqest.json()
     console.log(body)
     try {
@@ -42,35 +42,27 @@ export async function POST(reqest: Request) {
                 await fs.writeFile(portsFile, strConfigJSON)
 
                 const ymlFile = await fs.readFile(srcDir, 'utf8')
-                const data = yaml.load(ymlFile)
-                data['services'][body.userID] = {
-                    ...data['services']['ml'],
-                    container_name: body.userID,
-                    ports: [newPortNumber + ":8000"]
+                const data: object | any = yaml.load(ymlFile)
+                if (typeof data === "object") {
+                    data['services'][body.userID] = {
+                        ...data['services']['ml'],
+                        container_name: body.userID,
+                        ports: [newPortNumber + ":8000"]
+                    }
+                    data['services']['celery_worker' + body.userID] = {
+                        ...data['services']['celery_worker'],
+                        container_name: 'celery_worker' + body.userID,
+                        depends_on: [`${body.userID}`]
+                    }
+                    delete data['services']['ml']
+                    delete data['services']['celery_worker']
+                    const newYML = yaml.dump(data)
+                    await fs.writeFile(mlFolder + `/${body.userID}.yml`, newYML)
+                    return NextResponse.json({port: newPortNumber, "status": "done"})
                 }
-                // data['services']['ml']['container_name'] = body.userID
-                // data['services']['ml']['ports'] = [newPortNumber+":8000"]
-                data['services']['celery_worker' + body.userID] = {
-                    ...data['services']['celery_worker'],
-                    container_name: 'celery_worker' + body.userID,
-                    depends_on: [`${body.userID}`]
-                }
-                // data['services']['celery_worker']['container_name'] = 'celery_worker' + body.userID
-                // data['services']['celery_worker']['depends_on'] = [`${body.userID}`]
-                delete data['services']['ml']
-                delete data['services']['celery_worker']
-                const newYML = yaml.dump(data)
-                await fs.writeFile(mlFolder + `/${body.userID}.yml`, newYML)
-                return NextResponse.json({port: newPortNumber, "status": "done"})
+                else {return NextResponse.json({port: newPortNumber, "status": "done"})}
             }
-            // await fs.copyFile(srcDir, pathDir+`/${body.userID}.yml`)
-
         }
-        // const fileContents = await fs.readFile(jsonDirectory + '/data.json', 'utf8')
-        // const file = await fs.readFile(yamlDirectory , 'utf8')
-        // console.log("file",file)
-        // const doc = yaml.load(file)
-        // console.log(doc.services.celery_worker)
     } catch (e) {
         console.log(e)
     }

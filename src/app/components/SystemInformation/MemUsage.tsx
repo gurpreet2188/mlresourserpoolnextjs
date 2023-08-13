@@ -9,8 +9,9 @@ function MemUsage() {
     const fetchCPUUsage = async() =>{
       const res = await fetch('/api/ram-usage')
       const data = await res.json()
-      // console.log(data.siMemLoad.free / data.siMemLoad.total  * 100)
-      setMemusage(data.siMemLoad.free / data.siMemLoad.total  * 100)
+      // console.log(data.siMemLoad)
+      
+      setMemusage((data.siMemLoad.used / data.siMemLoad.total)  * 100)
       return 
     }
 

@@ -9,6 +9,7 @@ import RandomForest from './RandomForest'
 import LinearRegression from './LinearRegression'
 import DecisionTree from './DecisionTree'
 import Scorer from "@/app/components/nodesData/Scorer";
+import HelpMessage from "@/app/components/nodesData/HelpMessage";
 
 function NodesData() {
     const {nodeSettingsState, nodeSettingsDispatch} =
@@ -31,6 +32,24 @@ function NodesData() {
         return <LinearRegression id={'linearRegression'}/>
     } else if (nodeSettingsState.scorer.settingsActive) {
         return <Scorer id={'scorer'}/>
+    } else if (nodeSettingsState.columnFilter.helpMessage) {
+        return <HelpMessage id={'columnFilter'}/>
+    } else if (nodeSettingsState.rowFilter.helpMessage) {
+        return <HelpMessage id={'rowFilter'}/>
+    } else if (nodeSettingsState.tableView.helpMessage) {
+        return <HelpMessage id={'tableView'}/>
+    } else if (nodeSettingsState.knn.helpMessage) {
+        return <HelpMessage id={'knn'}/>
+    } else if (nodeSettingsState.randomForest.helpMessage) {
+        return <HelpMessage id={'randomForest'}/>
+    } else if (nodeSettingsState.decisionTree.helpMessage) {
+        return <HelpMessage id={'decisionTree'}/>
+    } else if (nodeSettingsState.linearRegression.helpMessage) {
+        return <HelpMessage id={'linearRegression'}/>
+    } else if (nodeSettingsState.scorer.helpMessage) {
+        return <HelpMessage id={'scorer'}/>
+    } else if (nodeSettingsState.csv.helpMessage) {
+        return <HelpMessage id={'csv'}/>
     }
 }
 

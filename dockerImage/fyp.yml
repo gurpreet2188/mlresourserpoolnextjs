@@ -1,0 +1,20 @@
+version: '2.2'
+services:
+  fyp:
+    container_name: fyp
+    build: .
+    command: bash -c "uvicorn main:main --host 0.0.0.0 --port 8000"
+    volumes:
+      - .:/app
+    ports:
+      - '8041:8000'
+    restart: always
+  celery_workerfyp:
+    container_name: celery_workerfyp
+    build: .
+    working_dir: /app
+    command: celery -A mlcelery worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - fyp

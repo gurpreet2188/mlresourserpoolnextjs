@@ -9,18 +9,31 @@ import {
 import SystemInformation from './components/SystemInformation/SystemInformation'
 
 const initialNodeSettingsStatus = {
-    csv: {settingsActive: false},
+    csv: {
+        settingsActive: false,
+        helpMessage: false,
+        message: "CSV Node is only Compatible with Column and Row filter and Table View Nodes."
+    },
     columnFilter: {
         settingsActive: false,
+        helpMessage: false,
         connectedWith: '',
         connectedAnchorID: '',
         columns: {col1: true, col2: true, col3: true},
-        ignoredCols: []
+        ignoredCols: [],
+        message: "Column Filter Node is only Compatible with Column and Row filter and Table View Nodes."
     },
-    rowFilter: {settingsActive: false, connectedWith: '', rows: [], rowColumn: '', dropNA: false,},
-    tableView: {settingsActive: false, connectedWith: ''},
+    rowFilter: {
+        settingsActive: false, helpMessage: false, connectedWith: '', rows: [], rowColumn: '', dropNA: false,
+        message: "Row Filter Node is only Compatible with Column Filter, CSV and Table View Nodes."
+    },
+    tableView: {
+        settingsActive: false, helpMessage: false, connectedWith: '',
+        message: ""
+    },
     knn: {
         settingsActive: false,
+        helpMessage: false,
         connectedWith: '',
         connectedAnchorID: '',
         target_column: '',
@@ -29,20 +42,24 @@ const initialNodeSettingsStatus = {
         weights: 'uniform',
         leaf_size: 30,
         test_size: 0.2,
-        n_neighbors:5
+        n_neighbors: 5,
+        message: "K-NN Node is only Compatible with Accuracy Score Node."
     },
     linearRegression: {
         settingsActive: false,
+        helpMessage: false,
         connectedWith: '',
         connectedAnchorID: '',
         target_column: '',
         type: 'linear_regress',
         fit_intercept: true,
         imputer_strategy: 'mean',
-        test_size: 0.2
+        test_size: 0.2,
+        message: "Linear Regression Node is only Compatible with Accuracy Score Node."
     },
     decisionTree: {
         settingsActive: false,
+        helpMessage: false,
         connectedWith: '',
         connectedAnchorID: '',
         target_column: '',
@@ -53,11 +70,13 @@ const initialNodeSettingsStatus = {
         min_samples_split: 10,
         min_samples_leaf: 10,
         random_state: null,
-        test_size: 0.2
+        test_size: 0.2,
+        message: "Decision Tree Node is only Compatible with Accuracy Score Node."
 
     },
     randomForest: {
         settingsActive: false,
+        helpMessage: false,
         connectedWith: '',
         connectedAnchorID: '',
         target_column: '',
@@ -68,9 +87,10 @@ const initialNodeSettingsStatus = {
         min_samples_split: 2,
         min_samples_leaf: 1,
         random_state: null,
-        test_size: 0.2
+        test_size: 0.2,
+        message: "Random Forest Node is only Compatible with Accuracy Score Node."
     },
-    scorer: {settingsActive: false, connectedWith: '',}
+    scorer: {settingsActive: false, helpMessage: false, connectedWith: '', message: ""}
 }
 
 export const NodesSettingsStatus = createContext<NodeSettingContext>({

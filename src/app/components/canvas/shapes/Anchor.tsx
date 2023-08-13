@@ -129,6 +129,7 @@ function Anchor({id, anchorID, nodeState, nodeDispatch, nodeDragging}: AnchorPor
                     y: nodeState[id].y + 30
                 }
             })
+            nodeSettingsDispatch({type:id, value:{helpMessage: true}})
         }
     }
 

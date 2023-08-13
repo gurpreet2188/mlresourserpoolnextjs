@@ -36,17 +36,19 @@ function Scorer({id}) {
                 allNodesConnected = true
             }
         }
-        console.log(allNodesConnected)
+
         const regex = /\b\w*regress\w*\b/g;
         if((nodeSettingsState[mlAlogID].type).match(regex)){
             setMLType('regression')
         }else {
             setMLType('classify')
         }
+
+        console.log('nodesCon',allNodesConnected)
         return [allNodesConnected, mlAlogID]
     }
 
-    console.log(mlType,'ml')
+
     const onClickHandle = async () => {
         const [check, mlAlgo] = checkNodeConnetion()
         setPending(true)

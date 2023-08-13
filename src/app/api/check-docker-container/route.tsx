@@ -1,20 +1,23 @@
 import {NextResponse} from "next/server"
+import {ContainerInfo} from "dockerode";
+import Dockerode from 'dockerode/index'
 // const Docker = require('dockerode')
-const Dockerode = require('dockerode')
-const docker = new Dockerode({socketPath: '/var/run/docker.sock'})
+const dockerode = require('dockerode')
+const docker = new dockerode({socketPath: '/var/run/docker.sock'})
 
 
-export async function POST(reqest: Request) {
+export async function POST(reqest: Request):Promise<NextResponse> {
     const body = await reqest.json()
 
-    const containers = await new Promise((resolve, reject) => {
-        docker.listContainers((err, containers) => {
+    const containers: Dockerode.ContainerInfo[] = await new Promise((resolve, reject) => {
+        docker.listContainers((err: any, containers: Dockerode.ContainerInfo[]) => {
             if (err) reject(err);
             resolve(containers);
         });
     })
+
     let check = false
-    containers.forEach(v => {
+    containers.forEach((v: Dockerode.ContainerInfo) => {
         if (v['Names'][0] === `/${body.userID}`) {
             check = true
         }

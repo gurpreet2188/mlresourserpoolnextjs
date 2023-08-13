@@ -1,0 +1,20 @@
+version: '2.2'
+services:
+  u2:
+    container_name: u2
+    build: .
+    command: bash -c "uvicorn main:main --host 0.0.0.0 --port 8000"
+    volumes:
+      - .:/app
+    ports:
+      - '8037:8000'
+    restart: always
+  celery_workeru2:
+    container_name: celery_workeru2
+    build: .
+    working_dir: /app
+    command: celery -A mlcelery worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - u2

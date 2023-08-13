@@ -242,48 +242,46 @@ function Workspace() {
             value: {connectedWith: ''}
         })
 
-        console.log('delete')
+    }
+
+
+    const deleteLinkNode = (type: string) => {
+        console.log('click')
+        if (type === 'link') {
+            deleteNodeLink(deleteLink.nodeID, deleteLink.anchorID, deleteLink.connectedWith)
+            setDeleteLink({nodeID: "", anchorID: "", connectedWith: ""})
+        } else {
+            for (const anchorID of nodeState[deleteNode.nodeID].anchors) {
+                nodeDispatch({
+                    type: 'updateAnchor',
+                    nodeID: deleteNode.nodeID,
+                    anchorID: anchorID,
+                    value: {connectedNode: ""}
+                })
+            }
+            nodeDispatch({
+                type: 'updateNode',
+                nodeID: deleteNode.nodeID,
+                value: {
+                    connected: false,
+                    active: false,
+                    x: nodeState[deleteNode.nodeID].staticX,
+                    y: nodeConfig[deleteNode.nodeID].y
+                }
+            })
+            setDeleteNode({nodeID: ''})
+        }
+
     }
 
     const deleteLinkHandle = (e: React.KeyboardEvent<HTMLDivElement>) => {
         if (e.key === 'Delete') {
             if (deleteLink.anchorID !== '' && deleteLink.nodeID !== '') {
-                // nodeDispatch({
-                //     type: 'updateAnchor',
-                //     nodeID: deleteLink.nodeID,
-                //     anchorID: deleteLink.anchorID,
-                //     value: {anchorConnected: false}
-                // })
-                // nodeSettingsDispatch({
-                //     type: deleteLink.connectedWith,
-                //     value: {connectedWith: ''}
-                // })
-                deleteNodeLink(deleteLink.nodeID, deleteLink.anchorID, deleteLink.connectedWith)
+                deleteLinkNode('link')
             }
             if (deleteNode.nodeID !== '') {
-                for (const anchorID of nodeState[deleteNode.nodeID].anchors) {
-                    nodeDispatch({
-                        type: 'updateAnchor',
-                        nodeID: deleteNode.nodeID,
-                        anchorID: anchorID,
-                        value: {connectedNode: ""}
-                    })
-                }
-                nodeDispatch({
-                    type: 'updateNode',
-                    nodeID: deleteNode.nodeID,
-                    value: {
-                        connected: false,
-                        active: false,
-                        x: nodeState[deleteNode.nodeID].staticX,
-                        y: nodeConfig[deleteNode.nodeID].y
-                    }
-                })
+                deleteLinkNode('node')
             }
-
-            setDeleteNode({nodeID: ''})
-            // console.log('setting', deleteLink)
-            setDeleteLink({nodeID: '', anchorID: '', connectedWith: ''})
         }
     }
 
@@ -303,7 +301,6 @@ function Workspace() {
                     ),
                 5000
             )
-
             return () => clearInterval(saveConfigInterval)
         }
     }, [nodeState, nodeSettingsState])
@@ -311,6 +308,11 @@ function Workspace() {
     // console.log(workspaceArea)
     return (
         <div onKeyDown={deleteLinkHandle} tabIndex={0} className='absolute'>
+            <div className='absolute flex flex-row gap-[2rem] top-[2rem] right-auto left-[50vw] z-50 text-white '>
+                <button onClick={()=>{
+                    deleteLinkNode('link')}} className='py-[0.5rem] px-[1rem] border border-white/50 bg-slate-700' style={{display:deleteLink.nodeID==="" ? "none" : 'block'}}>Delete Link</button>
+                <button onClick={()=>{deleteLinkNode('node')}} className='py-[0.5rem] px-[1rem] border border-white/50 bg-slate-700' style={{display:deleteNode.nodeID==="" ? "none" : 'block'}}>Delete Node</button>
+            </div>
             <Stage width={workspace.width} height={workspace.height}>
                 <Layer>
                     {verifyNodes() ? (
